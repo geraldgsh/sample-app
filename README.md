@@ -696,3 +696,139 @@ Updated using user.update_attributes
 
 ### Chapter 7
 
+7.1 Visit /about in your browser and use the debug information to determine the controller and action of the params hash.
+```sh
+--- !ruby/object:ActionController::Parameters
+parameters: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  controller: static_pages
+  action: home
+permitted: false
+```
+
+7.2 In the Rails console, pull the first user out of the database and assign it to the variable user. What is the output of puts user.attributes.to_yaml? Compare this to using the y method via y user.attributes.
+```sh
+>> user = User.first
+  User Load (0.8ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Michael Hartl", email: "mhartl@example.com", created_at: "2019-11-08 15:52:02", updated_at: "2019-11-08 15:52:02", password_digest: nil>
+>> puts user.attributes.to_yaml
+---
+id: 1
+name: Michael Hartl
+email: mhartl@example.com
+created_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &1 2019-11-08 15:52:02.677145000 Z
+  zone: &2 !ruby/object:ActiveSupport::TimeZone
+    name: Etc/UTC
+  time: *1
+updated_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &3 2019-11-08 15:52:02.677145000 Z
+  zone: *2
+  time: *3
+password_digest:
+=> nil
+>> y user.attributes
+---
+id: 1
+name: Michael Hartl
+email: mhartl@example.com
+created_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &1 2019-11-08 15:52:02.677145000 Z
+  zone: &2 !ruby/object:ActiveSupport::TimeZone
+    name: Etc/UTC
+  time: *1
+updated_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &3 2019-11-08 15:52:02.677145000 Z
+  zone: *2
+  time: *3
+password_digest:
+=> nil
+>>
+```
+
+7.3 Using embedded Ruby, add the created_at and updated_at “magic column” attributes to the user show page from Listing 7.4.
+```sh
+<%= @user.email %></p>
+<%= @user.name %></p>
+Created At: <%= @user.created_at %>
+Updated At: <%= @user.updated_at %>
+```
+
+7.4 Using embedded Ruby, add Time.now to the user show page. What happens when you refresh the browser?
+```sh
+<%= @user.email %></p>
+<%= @user.name %></p>
+Created At: <%= @user.created_at %>
+Updated At: <%= @user.updated_at %>
+Time Now: <%= Time.now %>
+```
+
+7.5 With the debugger in the show action as in Listing 7.6, hit /users/1. Use puts to display the value of the YAML form of the params hash. Hint: Refer to the relevant exercise in Section 7.1.1.1. How does it compare to the debug information shown by the debug method in the site template?
+```sh
+Put the debugger in the User new action and hit /users/new. What is the value of @user?
+```
+
+7.6 Put the debugger in the User new action and hit /users/new. What is the value of @user?
+```sh
+nil
+```
+
+7.7 Associate a Gravatar with your primary email address if you haven’t already. What is the MD5 hash associated with the image?
+```sh
+"$2a$12$ajuKX59FotDBUmIatO.Tg.bd1Z/pcR5xnuZ2myeiShmJEE/MldrsO"
+```
+
+
+7.8 Verify that the code in Listing 7.12 allows the gravatar_for helper defined in Section 7.1.4 to take an optional size parameter, allowing code like gravatar_for user, size: 50 in the view. (We’ll put this improved helper to use in Section 10.3.1.)
+```sh
+Done
+```
+
+7.9 The options hash used in the previous exercise is still commonly used, but as of Ruby 2.0 we can use keyword arguments instead. Confirm that the code in Listing 7.13 can be used in place of Listing 7.12. What are the diffs between the two?
+```sh
+Code tested. Main difference is the size in listing 7.13 is passed as an argument, and on listing 7.12 the size is saved in a hash called "options"
+```
+
+7.9 In Listing 7.15, replace :name with :nome. What error message do you get as a result?
+```sh
+undefined method `n0me' for #<User:0x00007fafe8603368>
+Did you mean?  name
+```
+
+7.10 Confirm by replacing all occurrences of f with foobar that the name of the block variable is irrelevant as far as the result is concerned. Why might foobar nevertheless be a bad choice?
+```sh
+Code still works after replacing every "f" with "foobar". It is a bad choice because the word "foobar" haves no relation to what the variable is used for.
+```
+
+7.11 Learn Enough HTML to Be Dangerous, in which all HTML is written by hand, doesn’t cover the form tag. Why not?
+```sh
+Because form is not a native HTML tag.
+```
+
+7.12 By hitting the URL /signup?admin=1, confirm that the admin attribute appears in the params debug information.
+```sh
+--- !ruby/object:ActionController::Parameters
+parameters: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  admin: '1'
+  controller: users
+  action: new
+permitted: false
+```
+
+7.13 Confirm by changing the minimum length of passwords to 5 that the error message updates automatically as well.
+```sh
+Name can't be blank
+Email can't be blank
+Email is invalid
+Password can't be blank
+Password can't be blank
+Password is too short (minimum is 5 characters)
+```
+
+7.14 How does the URL on the unsubmitted signup form (Figure 7.12) compare to the URL for a submitted signup form (Figure 7.18)? Why don’t they match?
+```sh
+The first url is signup and the second one is users. Because you're redirected to the users page after signing up.
+```
+
+
+
+
