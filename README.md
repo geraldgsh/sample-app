@@ -883,7 +883,20 @@ Green
 
 7.20 Confirm by updating Listing 7.28 and submitting a valid user that redirect_to user_url(@user) has the same effect as redirect_to @user.
 ```sh
-Redirected to correct page
+Putting redirect_to user_url(@user) in the create action, after checking if @user.save is true, redirects to the user show page, exactly in the same way as redirect to @user.
 ```
 
+7.21 In the console, confirm that you can use interpolation (Section 4.2.2) to interpolate a raw symbol. For example, what is the return value of "#{:success}"?
+```sh
+> "#{:success}"
+ => "success" 
+```
 
+7.22 How does the previous exercise relate to the flash iteration shown in Listing 7.30?
+```sh
+The div that contains the flash messages could be rewritten like this
+
+<div class="<%= "alert alert-#{message_type}" %>"></div>
+```
+
+7.23
