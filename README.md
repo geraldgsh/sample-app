@@ -693,3 +693,6 @@ User found
 ```sh
 Updated using user.update_attributes
 ```
+
+### Chapter 7
+
