@@ -7,7 +7,9 @@ Ruby on Rails
 
 2. Do [Chapter 4](https://www.learnenough.com/ruby-on-rails-4th-edition-tutorial/static_pages) of the tutorial to see how Ruby will be used in Rails.
 
-Things you may want to cover:
+3. Do [Chapter 5](https://www.learnenough.com/ruby-on-rails-4th-edition-tutorial/filling_in_the_layout)
+
+4. Do [Chapter 6](https://www.learnenough.com/ruby-on-rails-4th-edition-tutorial/modeling_users)
 
 ###  Ruby version
 
