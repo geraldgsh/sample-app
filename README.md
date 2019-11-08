@@ -829,6 +829,61 @@ Password is too short (minimum is 5 characters)
 The first url is signup and the second one is users. Because you're redirected to the users page after signing up.
 ```
 
+7.15 Write a test for the error messages implemented in Listing 7.20. How detailed you want to make your tests is up to you; a suggested template appears in Listing 7.25.
+```sh
+class UsersSignupTest < ActionDispatch::IntegrationTest
+  test "invalid signup information" do
+    get signup_path
+    assert_no_difference 'User.count' do
+      post users_path, params: { user: { name:  "",
+                                         email: "user@invalid",
+                                         password:              "foo",
+                                         password_confirmation: "bar" } }
+    end
+    assert_template 'users/new'
+    assert_select 'div#error_explanation'
+    assert_select 'div.alert.alert-danger'
+    assert_select "li", "Name can't be blank"
+    assert_select "li", "Email is invalid"
+    assert_select "li", "Password confirmation doesn't match Password"
+  end
+```
 
+
+7.16 The URLs for an unsubmitted signup form and for a submitted signup form are /signup and /users, respectively, which don’t match. This is due to our use of a custom named route in the former case (added in Listing 5.43) and a default RESTful route in the latter case (Listing 7.3). Resolve this discrepancy by adding the code shown in Listing 7.26 and Listing 7.27. Submit the new form to confirm that both cases now use the same /signup URL. Are the tests still green? Why?
+```sh
+The tests are still green because pointing post /signup to users#create just create another route for the same path and it does not invalidate the use of post /users to trigger the users#create action.
+```
+
+
+7.17 Update the post in Listing 7.25 to use the new URL from the previous exercise. Confirm that the tests are still green.
+```sh
+post signup_path, params: { user: { name:  "",
+                                         email: "user@invalid",
+                                         password:              "foo",
+                                         password_confirmation: "bar" } }
+
+Tests still green
+```
+
+
+7.18 Confirm by reverting Listing 7.27 to its previous form (Listing 7.20) that the tests are still green. This is a problem, because the URL being posted to isn’t right. Add an assert_select to the test in Listing 7.25 to catch this bug and get to red, then change the form back to Listing 7.27 to get the tests green again. Hint: Test for the presence of 'form[action="/signup"]' before posting to the form in the test.
+```sh
+Green
+```
+
+7.19 Using the Rails console, verify that a user is in fact created when submitting valid information.
+```sh
+>> User.all
+   (0.7ms)  SELECT sqlite_version(*)
+  User Load (0.3ms)  SELECT "users".* FROM "users" LIMIT ?  [["LIMIT", 11]]
+=> #<ActiveRecord::Relation [#<User id: 1, name: "Semy Velu", email: "samyvelu@railstutorial.org", created_at: "2019-11-08 15:52:02", updated_at: "2019-11-08 20:19:53", password_digest: [FILTERED]>, #<User id: 2, name: "A Nother", email: "another@example.org", created_at: "2019-11-08 15:52:45", updated_at: "2019-11-08 15:52:45", password_digest: nil>, #<User id: 4, name: "hacker noon", email: "hello@hacker.noon", created_at: "2019-11-08 22:22:05", updated_at: "2019-11-08 22:22:05", password_digest: [FILTERED]>]>
+>>
+```
+
+7.20 Confirm by updating Listing 7.28 and submitting a valid user that redirect_to user_url(@user) has the same effect as redirect_to @user.
+```sh
+Redirected to correct page
+```
 
 
