@@ -1,4 +1,4 @@
-# Microverse Project Title - Letsget building [Collaborative Project]
+# Microverse Project Title - Lets get building 
 Ruby on Rails
 
 ## Introduction.
@@ -43,7 +43,7 @@ Ubuntu 18.04 & below
 
 ### ...
 
-## Chapter 4 Exercises
+### Chapter 4
 
 4.1 Assign variables city and state to your current city and state of residence. (If residing outside the U.S., substitute the analogous quantities.)
 
@@ -449,5 +449,245 @@ class User
     "#{@last}, #{@first}"
   end
 end
+```
 
 4.35 Verify that full_name.split is the same as alphabetical_name.split(', ').reverse.
+
+### Chapter 5
+
+5.1 It’s well-known that no web page is complete without a cat image. Using the command in Listing 5.4, arrange to download the kitten pic shown in Figure 5.3.8
+
+5.2 Using the mv command, move kitten.jpg to the correct asset directory for images (Section 5.2.1).
+
+5.3 Using image_tag, add kitten.jpg to the Home page, as shown in Figure 5.4.
+
+5.4 Using code like that shown in Listing 5.10, comment out the cat image from Section 5.1.1.1. Verify using a web inspector that the HTML for the image no longer appears in the page source.
+
+5.5 By adding the CSS in Listing 5.11 to custom.scss, hide all images in the application—currently just the Rails logo on the Home page). Verify with a web inspector that, although the image doesn’t appear, the HTML source is still present.
+
+5.6 Replace the default Rails head with the call to render shown in Listing 5.18. Hint: For convenience, cut the default header rather than just deleting it.
+
+5.7 Because we haven’t yet created the partial needed by Listing 5.18, the tests should be red. Confirm that this is the case.
+
+5.8 Create the necessary partial in the layouts directory, paste in the contents, and verify that the tests are now green again.
+
+5.9 As suggested in Section 5.2.2, go through the steps to convert the footer CSS from Listing 5.17 to Listing 5.20 to SCSS by hand.
+
+5.10 Update the layout links to use the helf route from Listing 5.29.
+
+5.11 Revert the changes using Undo.
+
+5.12 In the footer partial, change about_path to contact_path and verify that the tests catch the error.
+
+5.13 It’s convenient to use the full_title helper in the tests by including the Application helper into the test helper, as shown in Listing 5.35. We can then test for the right title using code like Listing 5.36. This is brittle, though, because now any typo in the base title (such as “Ruby on Rails Tutoial”) won’t be caught by the test suite. Fix this problem by writing a direct test of the full_title helper, which involves creating a file to test the application helper and then filling in the code indicated with FILL_IN in Listing 5.37. (Listing 5.37 uses assert_equal <expected>, <actual>, which verifies that the expected result matches the actual value when compared with the == operator.)
+
+5.14 Per Table 5.1, change the route in Listing 5.41 to use signup_path instead of users_new_url.
+
+5.15 The route in the previous exercise doesn’t yet exist, so confirm that the tests are now red. (This is intended to help us get comfortable with the red/green flow of Test Driven Development (TDD, Box 3.3); we’ll get the tests back to green in Section 5.4.2.)
+
+5.16 If you didn’t solve the exercise in Section 5.4.1.1, change the test in Listing 5.41 to use the named route signup_path. Because of the route defined in Listing 5.43, this test should initially be green.
+
+5.17 In order to verify the correctness of the test in the previous exercise, comment out the signup route to get to red, then uncomment to get to green.
+
+5.18 In the integration test from Listing 5.32, add code to visit the signup page using the get method and verify that the resulting page title is correct. Hint: Use the full_title helper as in Listing 5.36.
+
+### Chapter 6
+
+6.1 Rails uses a file called schema.rb in the db/ directory to keep track of the structure of the database (called the schema, hence the filename). Examine your local copy of db/schema.rb and compare its contents to the migration code in Listing 6.2.
+```sh
+Contents are pretty much identical, same iterations.
+```
+
+6.2 Most migrations (including all the ones in this tutorial) are reversible, which means we can “migrate down” and undo them with a single command, called db:rollback: $ rails db:rollback After running this command, examine db/schema.rb to confirm that the rollback was successful. (See Box 3.1 for another technique useful for reversing migrations.) Under the hood, this command executes the drop_table command to remove the users table from the database. The reason this works is that the change method knows that drop_table is the inverse of create_table, which means that the rollback migration can be easily inferred. In the case of an irreversible migration, such as one to remove a database column, it is necessary to define separate up and down methods in place of the single change method. Read about migrations in the Rails Guides for more information.
+```sh
+schema.rb is now empty
+```
+
+6.3 Re-run the migration by executing rails db:migrate again. Confirm that the contents of db/schema.rb have been restored.
+```sh
+schema.rb content has been restored
+```
+
+6.4 In a Rails console, use the technique from Section 4.4.4 to confirm that User.new is of class User and inherits from ApplicationRecord.
+```sh
+>> User.new.class
+=> User(id: integer, name: string, email: string, created_at: datetime, updated_at: datetime)
+>> User.new.class.superclass
+=> ApplicationRecord(abstract)
+```
+
+6.5 Confirm that ApplicationRecord inherits from ActiveRecord::Base.
+```sh
+>> User.new.class.superclass.superclass
+=> ActiveRecord::Base
+```
+
+6.6 Confirm that user.name and user.email are of class String.
+```sh
+>> user.created_at.class
+=> ActiveSupport::TimeWithZone
+>> user.updated_at.class
+=> ActiveSupport::TimeWithZone
+```
+
+6.7 Of what class are the created_at and updated_at attributes?
+```sh
+>> user.created_at.class
+=> ActiveSupport::TimeWithZone
+>> user.updated_at.class
+=> ActiveSupport::TimeWithZone
+```
+
+6.8 Find the user by name. Confirm that find_by_name works as well. (You will often encounter this older style of find_by in legacy Rails applications.)
+```sh
+>> User.find_by(name: "Michael Hartl")
+  User Load (0.3ms)  SELECT "users".* FROM "users" WHERE "users"."name" = ? LIMIT ?  [["name", "Michael Hartl"], ["LIMIT", 1]]
+=> #<User id: 1, name: "Michael Hartl", email: "mhartl@example.com", created_at: "2019-11-06 20:36:51", updated_at: "2019-11-06 20:36:51", password_digest: [FILTERED]>
+>> User.find_by_name ("Michael Hartl")
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."name" = ? LIMIT ?  [["name", "Michael Hartl"], ["LIMIT", 1]]
+=> #<User id: 1, name: "Michael Hartl", email: "mhartl@example.com", created_at: "2019-11-06 20:36:51", updated_at: "2019-11-06 20:36:51", password_digest: [FILTERED]>
+```
+
+6.9 For most practical purposes, User.all acts like an array, but confirm that in fact it’s of class User::ActiveRecord_Relation.
+```sh
+>> User.all.class
+=> User::ActiveRecord_Relation
+```
+
+6.10 Confirm that you can find the length of User.all by passing it the length method (Section 4.2.3). Ruby’s ability to manipulate objects based on how they act rather than on their formal class type is called duck typing, based on the aphorism that “If it looks like a duck, and it quacks like a duck, it’s probably a duck.”
+```sh
+>> User.all.length
+  User Load (0.4ms)  SELECT "users".* FROM "users"
+=> 3
+```
+
+6.11 Update the user’s name using assignment and a call to save.
+```sh
+>> user.update_attributes(name: "Dude where", email: "dude@email.com")
+DEPRECATION WARNING: update_attributes is deprecated and will be removed from Rails 6.1 (please, use update instead) (called from irb_binding at (irb):52)
+   (0.1ms)  SAVEPOINT active_record_1
+  User Update (0.3ms)  UPDATE "users" SET "email" = ?, "updated_at" = ?, "name" = ? WHERE "users"."id" = ?  [["email", "dude@email.com"], ["updated_at", "2019-11-06 17:17:56.864729"], ["name", "Dude where"], ["id", 1]]
+   (0.2ms)  RELEASE SAVEPOINT active_record_1
+=> true
+>> user.name
+```
+
+6.12 Update the user’s email address using a call to update_attributes.
+```sh
+>> user.email = "samso@email.com"
+=> "samso@email.com"
+```
+
+6.13 Confirm that you can change the magic columns directly by updating the created_at column using assignment and a save. Use the value 1.year.ago, which is a Rails way to create a timestamp one year before the present time.
+```sh
+>> user.created_at = 1.year.ago
+=> Tue, 06 Nov 2018 17:24:34 UTC +00:00
+>> user.save
+   (0.2ms)  SAVEPOINT active_record_1
+  User Update (1.4ms)  UPDATE "users" SET "created_at" = ?, "updated_at" = ? WHERE "users"."id" = ?  [["created_at", "2018-11-06 17:24:34.304272"], ["updated_at", "2019-11-06 17:24:38.607033"], ["id", 1]]
+   (0.1ms)  RELEASE SAVEPOINT active_record_1
+=> true
+>> user.created_at
+=> Tue, 06 Nov 2018 17:24:34 UTC +00:00
+```
+
+6.14 In the console, confirm that a new user is currently valid.
+```sh
+>> user = User.new(name: "Sir Grey", email: "sirgrey@email.com")
+   (1.1ms)  SELECT sqlite_version(*)
+=> #<User id: nil, name: "Sir Grey", email: "sirgrey@email.com", created_at: nil, updated_at: nil>
+>> user.valid?
+=> true
+```
+
+6.15 Confirm that the user created in Section 6.1.3 is also valid.
+```sh
+>> user = User.new(name: "Michael Hartl", email: "mhartl@example.com")
+=> #<User id: nil, name: "Michael Hartl", email: "mhartl@example.com", created_at: nil, updated_at: nil>
+>> user.valid?
+=> true
+```
+
+6.16 Make a new user called u and confirm that it’s initially invalid. What are the full error messages?
+```sh
+>> u = User.new
+=> #<User id: nil, name: nil, email: nil, created_at: nil, updated_at: nil>
+>> u.valid?
+=> false
+```
+
+6.17 Confirm that u.errors.messages is a hash of errors. How would you access just the email errors?
+```sh
+>> u.errors.messages
+=> {:name=>["can't be blank"], :email=>["can't be blank"]}
+>> u.errors[:email]
+=> ["can't be blank"]
+```
+
+6.18 Make a new user with too-long name and email and confirm that it’s not valid.
+```sh
+>> ben = User.new(name: "b"*55, email: "p"*256)
+   (0.7ms)  SELECT sqlite_version(*)
+=> #<User id: nil, name: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb...", email: "pppppppppppppppppppppppppppppppppppppppppppppppppp...", created_at: nil, updated_at: nil>
+>> ben.save
+=> false
+>> ben.valid?
+=> false
+```
+
+6.19 What are the error messages generated by the length validation?
+```sh
+=> {:name=>["is too long (maximum is 50 characters)"], :email=>["is too long (maximum is 255 characters)"]}
+```
+
+
+6.20 By pasting in the valid addresses from Listing 6.18 and invalid addresses from Listing 6.19 into the test string area at Rubular, confirm that the regex from Listing 6.21 matches all of the valid addresses and none of the invalid ones.
+```sh
+Addresses tested, results as expected.
+```
+
+6.21 As noted above, the email regex in Listing 6.21 allows invalid email addresses with consecutive dots in the domain name, i.e., addresses of the form foo@bar..com. Add this address to the list of invalid addresses in Listing 6.19 to get a failing test, and then use the more complicated regex shown in Listing 6.23 to get the test to pass.
+```sh
+Test 1: 6 tests, 11 assertions, 1 failures, 0 errors, 0 skips
+
+Test 2: 6 tests, 11 assertions, 0 failures, 0 errors, 0 skips
+```
+
+6.22 Add foo@bar..com to the list of addresses at Rubular, and confirm that the regex shown in Listing 6.23 matches all the valid addresses and none of the invalid ones.
+```sh
+Results matched
+```
+
+6.23 Add a test for the email downcasing from Listing 6.32, as shown in Listing 6.33. This test uses the reload method for reloading a value from the database and the assert_equal method for testing equality. To verify that Listing 6.33 tests the right thing, comment out the before_save line to get to red, then uncomment it to get to green.
+```sh
+Test added, confirmed to be red after commenting the "before_save" line: 15 tests, 30 assertions, 1 failures, 0 errors, 0 skips
+```
+
+6.24 Confirm that a user with valid name and email still isn’t valid overall.
+```sh
+Changed test user to @user = User.new(name: "Example User", email: "user@example.com",password: "", password_confirmation: "")
+
+Tests are now red
+13 tests, 20 assertions, 1 failures, 1 errors, 0 skips
+```
+
+6.25 What are the error messages for a user with no password?
+```sh
+"=> ["Password can't be blank"]"
+```
+
+6.26 Quit and restart the console, and then find the user created in this section.
+```sh
+User found
+
+6.27 Try changing the name by assigning a new name and calling save. Why didn’t it work?
+
+>> user.errors.full_messages
+
+=> ["Password can't be blank", "Password is too short (minimum is 6 characters)"]
+```
+
+6.28 Update user’s name to use your name. Hint: The necessary technique is covered in Section 6.1.5.
+```sh
+Updated using user.update_attributes
+```
