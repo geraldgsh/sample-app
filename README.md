@@ -899,4 +899,98 @@ The div that contains the flash messages could be rewritten like this
 <div class="<%= "alert alert-#{message_type}" %>"></div>
 ```
 
-7.23
+7.23 Using the Rails console, find by the email address to double-check that the new user was actually created. The result should look something like Listing 7.32.
+```sh
+>> User.all
+   (2.0ms)  SELECT sqlite_version(*)
+  User Load (0.8ms)  SELECT "users".* FROM "users" LIMIT ?  [["LIMIT", 11]]
+=> #<ActiveRecord::Relation [#<User id: 1, name: "Exemplify Simple", email: "examplify@email.com", created_at: "2019-11-09 19:41:40", updated_at: "2019-11-09 19:41:40", password_digest: [FILTERED]>]>
+>>
+```
+
+7.24 Create a new user with your primary email address. Verify that the Gravatar correctly appears.
+```sh
+Yes!
+```
+
+7.25 Write a test for the flash implemented in Section 7.4.2. How detailed you want to make your tests is up to you; a suggested ultra-minimalist template appears in Listing 7.34, which you should complete by replacing FILL_IN with the appropriate code. (Even testing for the right key, much less the text, is likely to be brittle, so I prefer to test only that the flash isn’t empty.)
+```sh
+require 'test_helper'
+
+class UsersSignupTest < ActionDispatch::IntegrationTest
+
+  test "valid signup information" do
+    get signup_path
+    assert_difference 'User.count', 1 do
+      post users_path, params: { user: { name:  "Example User",
+                                         email: "user@example.com",
+                                         password:              "password",
+                                         password_confirmation: "password" } }
+    end
+    follow_redirect!
+    assert_template 'users/show'
+    assert_not flash.empty?
+  end
+end
+
+assert_not flash.empty?
+
+# Running:
+
+..
+
+Finished in 1.410283s, 1.4182 runs/s, 7.0908 assertions/s.
+2 runs, 10 assertions, 0 failures, 0 errors, 0 skips
+```
+
+7.26 As noted above, the flash HTML in Listing 7.31 is ugly. Verify by running the test suite that the cleaner code in Listing 7.35, which uses the Rails content_tag helper, also works.
+```sh
+<% flash.each do |message_type, message| %>
+   <%= content_tag(:div, message, class: "alert alert-#{message_type}") %>
+<% end %>
+
+Run options: --seed 41520
+
+# Running:
+
+..................
+
+Finished in 2.063404s, 8.7234 runs/s, 16.9623 assertions/s.
+18 runs, 35 assertions, 0 failures, 0 errors, 0 skips
+```
+
+7.27 Verify that the test fails if you comment out the redirect line in Listing 7.28.
+```sh
+def create
+  	@user = User.new(user_params)
+    if @user.save
+      flash[:success] = "Welcome to the Sample App!"
+   >> #redirect_to user_url(@user)
+    else
+      render 'new'
+    end
+  end
+
+# Running:
+
+................E
+
+Error:
+UsersSignupTest#test_valid_signup_information:
+RuntimeError: not a redirect! 204 No Content
+    test/integration/users_signup_test.rb:13:in `block in <class:UsersSignupTest>'
+
+
+rails test test/integration/users_signup_test.rb:5
+
+.
+
+Finished in 2.060987s, 8.7337 runs/s, 16.0117 assertions/s.
+18 runs, 33 assertions, 0 failures, 1 errors, 0 skips
+```
+
+7.28 Suppose we changed @user.save to false in Listing 7.28. How does this change verify that the assert_difference block is testing the right thing?
+```sh
+If @user.save was false, the validations are catching wrong user information that is trying to be saved, and we could be sure of this by noting that the User.count it not one more than it was before
+```
+
