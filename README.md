@@ -994,3 +994,12 @@ Finished in 2.060987s, 8.7337 runs/s, 16.0117 assertions/s.
 If @user.save was false, the validations are catching wrong user information that is trying to be saved, and we could be sure of this by noting that the User.count it not one more than it was before
 ```
 
+7.29 Confirm on your browser that the SSL lock and https appear.
+```sh
+Confirmed the browser is showing the SSL lock.
+```
+
+7.30 Create a user on the production site using your primary email address. Does your Gravatar appear correctly?
+```sh
+User created, gravatar is shown correctly
+```
