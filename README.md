@@ -1003,3 +1003,42 @@ Confirmed the browser is showing the SSL lock.
 ```sh
 User created, gravatar is shown correctly
 ```
+
+### Chapter 8
+
+8.1 What is the difference between GET login_path and POST login_path?
+```sh
+The GET login_path is used to render the view for the login form, and the POST login_path is used to send a post request when the user submits the login form, creating a new session
+```
+
+8.2 By piping the results of rails routes to grep, list all the routes associated with the Users resource. Do the same for Sessions. How many routes does each resource have? Hint: Refer to the section on grep in Learn Enough Command Line to Be Dangerous.
+```sh
+$ rails routes | grep 'users#'
+   signup GET    /signup(.:format)         users#new
+          POST   /signup(.:format)         users#create
+    users GET    /users(.:format)          users#index
+          POST   /users(.:format)          users#create
+ new_user GET    /users/new(.:format)      users#new
+edit_user GET    /users/:id/edit(.:format) users#edit
+     user GET    /users/:id(.:format)      users#show
+          PATCH  /users/:id(.:format)      users#update
+          PUT    /users/:id(.:format)      users#update
+          DELETE /users/:id(.:format)      users#destroy
+
+$ rails routes | grep 'sessions#'
+    login GET    /login(.:format)          sessions#new
+          POST   /login(.:format)          sessions#create
+   logout DELETE /logout(.:format)         sessions#destroy
+
+$ rails routes | grep 'users#' | wc -l
+10
+
+$ rails routes | grep 'sessions#' | wc -l
+3
+```
+
+8.3 Submissions from the form defined in Listing 8.4 will be routed to the Session controller’s create action. How does Rails know to do this? Hint: Refer to Table 8.1 and the first line of Listing 8.5.
+```sh
+Because in the form_for we defined the key url: and the value login_path to the hash, causing the URL to be posting to /login. And in the routes file we defined that the post to /login is routed to the create action in the sessions controller.
+````
+
