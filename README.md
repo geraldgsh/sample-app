@@ -1060,8 +1060,53 @@ Because in the form_for we defined the key url: and the value login_path to the 
 
 8.5 Verify in your browser that the sequence from Section 8.1.4 works correctly, i.e., that the flash message disappears when you click on a second page.
 ```sh
-YEs, message disappears
+Yes, message disappears
 ```
 
+8.6 Log in with a valid user and inspect your browser’s cookies. What is the value of the session content? Hint: If you don’t know how to view your browser’s cookies, Google for it (Box 1.1).
+```sh
+
+Found on the developers panel inside the Application pane.
+
+%2BOlS3KHgxI2S1eZZfOpJ0zguFLBdTuK1kLPJ%2BlFUzwqlKYvIgln3k3QkIYh%2BxzVqgF%2BsC5WDbLJ9xDHzkfoehZ6aK0OQ0yYYfgmYGuggZ4pkZOdVXY%2FeAQcMMXJ%2FlihCcdvDMT%2FjmFis5QO%2B1P%2BXhYxAqmcmY4%2FMW%2BfP7%2BqrWfP%2F%2FRtUn78FY0fzPXQGzLQmVIN7z6DWRA6aLS0I3OXshfp22d%2B6JYNmvdS5J0TbM0E9Q8tpfJrHoVqxTWgSJlesLHLyuBwGh%2B12VQHlAehxmtosAVADbUnjUOtumzrsjJcHWAtEgbjCzOwnvNc%3D--UQ1EQ%2BEU8GeC5WkX--UO3Irryv4t0obxIgy7X1tw%3D%3D
+```
+
+8.7 What is the value of the Expires attribute from the previous exercise?
+```sh
+Session expires on closure
+```
+
+8.8 Confirm at the console that User.find_by(id: ...) returns nil when the corresponding user doesn’t exist.
+```sh
+>> User.find_by(id: 99 )
+  User Load (0.5ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 99], ["LIMIT", 1]]
+=> nil
+```
+
+8.9 In a Rails console, create a session hash with key :user_id. By following the steps in Listing 8.17, confirm that the ||= operator works as required.
+```sh
+
+>> session= {}
+=> {}
+
+>> session[:user_id] = nil
+=> nil
+
+>> @current_user ||= User.find_by(id: session[:user_id])
+  User Load (0.6ms)  SELECT "users".* FROM "users" WHERE "users"."id" IS NULL LIMIT ?  [["LIMIT", 1]]
+=> nil
+
+>> session[:user_id]= User.first.id
+  User Load (0.4ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> 1
+
+>> @current_user ||= User.find_by(id: session[:user_id])
+  User Load (0.4ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+=> #<User id: 1, name: "Batman Robin", email: "batman@email.com", created_at: "2019-11-12 22:16:04", updated_at: "2019-11-12 22:16:04", password_digest: [FILTERED]>
+
+>> @current_user ||= User.find_by(id: session[:user_id])
+=> #<User id: 1, name: "Batman Robin", email: "batman@email.com", created_at: "2019-11-12 22:16:04", updated_at: "2019-11-12 22:16:04", password_digest: [FILTERED]>
+
+```
 
 
