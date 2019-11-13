@@ -1226,3 +1226,81 @@ Verified that the logout link works as expected. Once the redirect happens, the 
 ```sh
 The session is correctly removed after the log out action
 ```
+
+### Chapter 9
+
+9.1 In the console, assign user to the first user in the database, and verify by calling it directly that the remember method works. How do remember_token and remember_digest compare?
+```sh
+>> user =  User.first
+  User Load (0.3ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "batman", email: "batman@email.com", created_at: "2019-11-13 20:32:28", updated_at: "2019-11-13 20:32:28", password_digest: [FILTERED], remember_digest: nil>
+>> user.remember
+   (0.1ms)  begin transaction
+  User Update (2.6ms)  UPDATE "users" SET "updated_at" = ?, "remember_digest" = ? WHERE "users"."id" = ?  [["updated_at", "2019-11-13 20:33:41.383925"], ["remember_digest", "$2a$12$WCpcXtpJTEYdb9NhDBn29.m4RFaHSHWVm.8oKJ1EKnqq9/QWoxoli"], ["id", 1]]
+   (2.9ms)  commit transaction
+=> true
+>> user.remember_token
+=> "8QMXQIgj3efvxBvvvf6ZrA"
+>> user.remember_digest
+=> "$2a$12$WCpcXtpJTEYdb9NhDBn29.m4RFaHSHWVm.8oKJ1EKnqq9/QWoxoli"
+
+Digest has longer hash
+```
+
+9.2 In Listing 9.3, we defined the new token and digest class methods by explicitly prefixing them with User. This works fine and, because they are actually called using User.new_token and User.digest, it is probably the clearest way to define them. But there are two perhaps more idiomatically correct ways to define class methods, one slightly confusing and one extremely confusing. By running the test suite, verify that the implementations in Listing 9.4 (slightly confusing) and Listing 9.5 (extremely confusing) are correct. (Note that, in the context of Listing 9.4 and Listing 9.5, self is the User class, whereas the other uses of self in the User model refer to a user object instance. This is part of what makes them confusing.)
+```sh
+Rails test for both tested successfully
+```
+
+9.3 By finding the cookie in your local browser, verify that a remember token and encrypted user id are present after logging in.
+```sh
+Yes, its there
+```
+
+9.4 At the console, verify directly that the authenticated? method defined in Listing 9.6 works correctly.
+```sh
+>> user = User.first
+   (0.8ms)  SELECT sqlite_version(*)
+  User Load (0.5ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "batman", email: "batman@email.com", created_at: "2019-11-13 20:32:28", updated_at: "2019-11-13 22:00:07", password_digest: [FILTERED], remember_digest: "$2a$12$DBU3ZAg7DPIUlMyNaGJnnu4d8t.UjiafbwHK5IGUJ7F...">
+>>
+>> user.authenticated?('no token')
+=> false
+>>
+>> user.remember
+   (0.1ms)  begin transaction
+  User Update (296.9ms)  UPDATE "users" SET "updated_at" = ?, "remember_digest" = ? WHERE "users"."id" = ?  [["updated_at", "2019-11-13 22:03:52.721472"], ["remember_digest", "$2a$12$5Jwjq5N2Aelm0IrU/0L4x.K3OGIWIhpFscSdTuOKD53NmqDgWIOxa"], ["id", 1]]
+   (3.3ms)  commit transaction
+=> true
+>>
+>> user.authenticated?(user.remember_token)
+=> true
+```
+
+9.5 After logging out, verify that the corresponding cookies have been removed from your browser.
+```sh
+Cookie disappears after logging out
+```
+
+9.6 Comment out the fix in Listing 9.16 and then verify that the first subtle bug is present by opening two logged-in tabs, logging out in one, and then clicking “Log out” link in the other.
+```sh
+Pages still appears to be logged in after being logged out
+```
+
+9.7 Comment out the fix in Listing 9.19 and verify that the second subtle bug is present by logging out in one browser and closing and opening the second browser.
+```sh
+Still logged in on second browser
+```
+
+9.8 Uncomment the fixes and confirm that the test suite goes from red to green.
+```sh
+rails test
+
+# Running:
+
+.....................
+
+Finished in 1.422743s, 14.7602 runs/s, 34.4405 assertions/s.
+21 runs, 49 assertions, 0 failures, 0 errors, 0 skips
+```
+
