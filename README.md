@@ -1304,3 +1304,17 @@ Finished in 1.422743s, 14.7602 runs/s, 34.4405 assertions/s.
 21 runs, 49 assertions, 0 failures, 0 errors, 0 skips
 ```
 
+9.9 By inspecting your browser’s cookies directly, verify that the “remember me” checkbox is having its intended effect.
+```sh
+The checkbox is working and it saves the remember_token and the user_id in the session cookies for 20 years
+```
+
+9.10 At the console, invent examples showing both possible behaviors of the ternary operator (Box 9.2).
+```sh
+>> User.name == 'batwoman' ? 'yes' : 'no'
+=> "no"
+>> User.name != 'batwoman' ? 'yes' : 'no'
+=> "yes"
+>>
+```
+
