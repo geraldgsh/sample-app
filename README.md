@@ -1003,3 +1003,226 @@ Confirmed the browser is showing the SSL lock.
 ```sh
 User created, gravatar is shown correctly
 ```
+
+### Chapter 8
+
+8.1 What is the difference between GET login_path and POST login_path?
+```sh
+The GET login_path is used to render the view for the login form, and the POST login_path is used to send a post request when the user submits the login form, creating a new session
+```
+
+8.2 By piping the results of rails routes to grep, list all the routes associated with the Users resource. Do the same for Sessions. How many routes does each resource have? Hint: Refer to the section on grep in Learn Enough Command Line to Be Dangerous.
+```sh
+$ rails routes | grep 'users#'
+   signup GET    /signup(.:format)         users#new
+          POST   /signup(.:format)         users#create
+    users GET    /users(.:format)          users#index
+          POST   /users(.:format)          users#create
+ new_user GET    /users/new(.:format)      users#new
+edit_user GET    /users/:id/edit(.:format) users#edit
+     user GET    /users/:id(.:format)      users#show
+          PATCH  /users/:id(.:format)      users#update
+          PUT    /users/:id(.:format)      users#update
+          DELETE /users/:id(.:format)      users#destroy
+
+$ rails routes | grep 'sessions#'
+    login GET    /login(.:format)          sessions#new
+          POST   /login(.:format)          sessions#create
+   logout DELETE /logout(.:format)         sessions#destroy
+
+$ rails routes | grep 'users#' | wc -l
+10
+
+$ rails routes | grep 'sessions#' | wc -l
+3
+```
+
+8.3 Submissions from the form defined in Listing 8.4 will be routed to the Session controller’s create action. How does Rails know to do this? Hint: Refer to Table 8.1 and the first line of Listing 8.5.
+```sh
+Because in the form_for we defined the key url: and the value login_path to the hash, causing the URL to be posting to /login. And in the routes file we defined that the post to /login is routed to the create action in the sessions controller.
+````
+
+8.4 Using the Rails console, confirm each of the values in Table 8.2. Start with user = nil, and then use user = User.first. Hint: To coerce the result to a boolean value, use the bang-bang trick from Section 4.2.3, as in !!(user && user.authenticate('foobar')).
+```sh
+>> user = nil
+=> nil
+>> !!(user && user.authenticate('buzzword'))
+=> false
+>>
+>> user = User.first
+  User Load (0.5ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Batman Robin", email: "batman@email.com", created_at: "2019-11-12 22:16:04", updated_at: "2019-11-12 22:16:04", password_digest: [FILTERED]>
+>> !!(user && user.authenticate('buzzword'))
+=> true
+>> !!(user && user.authenticate('buzzwor'))
+=> false
+```
+
+8.5 Verify in your browser that the sequence from Section 8.1.4 works correctly, i.e., that the flash message disappears when you click on a second page.
+```sh
+Yes, message disappears
+```
+
+8.6 Log in with a valid user and inspect your browser’s cookies. What is the value of the session content? Hint: If you don’t know how to view your browser’s cookies, Google for it (Box 1.1).
+```sh
+
+Found on the developers panel inside the Application pane.
+
+%2BOlS3KHgxI2S1eZZfOpJ0zguFLBdTuK1kLPJ%2BlFUzwqlKYvIgln3k3QkIYh%2BxzVqgF%2BsC5WDbLJ9xDHzkfoehZ6aK0OQ0yYYfgmYGuggZ4pkZOdVXY%2FeAQcMMXJ%2FlihCcdvDMT%2FjmFis5QO%2B1P%2BXhYxAqmcmY4%2FMW%2BfP7%2BqrWfP%2F%2FRtUn78FY0fzPXQGzLQmVIN7z6DWRA6aLS0I3OXshfp22d%2B6JYNmvdS5J0TbM0E9Q8tpfJrHoVqxTWgSJlesLHLyuBwGh%2B12VQHlAehxmtosAVADbUnjUOtumzrsjJcHWAtEgbjCzOwnvNc%3D--UQ1EQ%2BEU8GeC5WkX--UO3Irryv4t0obxIgy7X1tw%3D%3D
+```
+
+8.7 What is the value of the Expires attribute from the previous exercise?
+```sh
+Session expires on closure
+```
+
+8.8 Confirm at the console that User.find_by(id: ...) returns nil when the corresponding user doesn’t exist.
+```sh
+>> User.find_by(id: 99 )
+  User Load (0.5ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 99], ["LIMIT", 1]]
+=> nil
+```
+
+8.9 In a Rails console, create a session hash with key :user_id. By following the steps in Listing 8.17, confirm that the ||= operator works as required.
+```sh
+
+>> session= {}
+=> {}
+
+>> session[:user_id] = nil
+=> nil
+
+>> @current_user ||= User.find_by(id: session[:user_id])
+  User Load (0.6ms)  SELECT "users".* FROM "users" WHERE "users"."id" IS NULL LIMIT ?  [["LIMIT", 1]]
+=> nil
+
+>> session[:user_id]= User.first.id
+  User Load (0.4ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> 1
+
+>> @current_user ||= User.find_by(id: session[:user_id])
+  User Load (0.4ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+=> #<User id: 1, name: "Batman Robin", email: "batman@email.com", created_at: "2019-11-12 22:16:04", updated_at: "2019-11-12 22:16:04", password_digest: [FILTERED]>
+
+>> @current_user ||= User.find_by(id: session[:user_id])
+=> #<User id: 1, name: "Batman Robin", email: "batman@email.com", created_at: "2019-11-12 22:16:04", updated_at: "2019-11-12 22:16:04", password_digest: [FILTERED]>
+
+```
+
+8.10 Using the cookie inspector in your browser (Section 8.2.1.1), remove the session cookie and confirm that the layout links revert to the non-logged-in state.
+```sh
+After deleting the cookies, the "Account" menu is gone, and is replaced by the "Log in" button.
+```
+
+8.11 Log in again, confirming that the layout links change correctly. Then quit your browser and start it again to confirm that the layout links revert to the non-logged-in state. (If your browser has a “remember where I left off” feature that automatically restores the session, be sure to disable it in this step (Box 1.1).)
+```sh
+Yes, page reverts back to non-logged in state
+```
+
+8.12 Delete the bang ! in the Session helper’s logged_in? method and confirm that the test in Listing 8.23 is red.
+```sh
+
+app/helpers/sessions_helper.rb
+
+def logged_in?
+    current_user.nil?
+end
+
+
+rails test test/integration/users_login_test.rb
+# Running:
+
+E
+
+Error:
+UsersLoginTest#test_login_with_valid_information:
+ActionView::Template::Error: undefined method `logged_in?' for #<#<Class:0x00007ffff2ba1dd8>:0x00007ffff2d1a570>
+Did you mean?  log_in
+    app/views/layouts/_header.html.erb:8
+    app/views/layouts/application.html.erb:9
+    test/integration/users_login_test.rb:10:in `block in <class:UsersLoginTest>'
+
+
+rails test test/integration/users_login_test.rb:9
+
+
+
+Finished in 1.522715s, 0.6567 runs/s, 0.0000 assertions/s.
+1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
+```
+
+8.13 Restore the ! to get back to green.
+```sh
+def logged_in?
+    current_user.nil?
+end
+
+app/helpers/sessions_helper.rb
+
+rails test test/integration/users_login_test.rb
+
+# Running:
+
+.
+
+Finished in 1.776740s, 0.5628 runs/s, 3.3770 assertions/s.
+1 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
+
+8.14 s the test suite red or green if you comment out the log_in line in Listing 8.25?
+```sh
+def logged_in?
+    current_user.nil?
+end
+
+app/helpers/sessions_helper.rb
+
+rails test test/integration/users_login_test.rb
+
+Run options: --seed 45848
+
+# Running:
+
+.
+
+Finished in 136.614150s, 0.0073 runs/s, 0.0439 assertions/s.
+1 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
+
+8.15 By using your text editor’s ability to comment out code, toggle back and forth between commenting out code in Listing 8.25?
+```sh
+rails test
+
+Run options: --seed 33546
+
+# Running:
+
+.................F
+
+Failure:
+UsersSignupTest#test_valid_signup_information [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/integration/users_signup_test.rb:15]:
+Expected false to be truthy.
+
+
+rails test test/integration/users_signup_test.rb:5
+
+..
+
+Finished in 2.313372s, 8.6454 runs/s, 18.1553 assertions/s.
+20 runs, 42 assertions, 1 failures, 0 errors, 0 skips
+```
+
+8.16 By using your text editor’s ability to comment out code, toggle back and forth between commenting out code in Listing 8.25 and confirm that the test suite toggles between red and green. (You will need to save the file between toggles.)
+```sh 
+It's confirmed that if we comment out that log_in line the tests will be red, and if we leave it there without commenting, the tests will be green.
+```
+
+8.17 Confirm in a browser that the “Log out” link causes the correct changes in the site layout. What is the correspondence between these changes and the final three steps in Listing 8.31?
+```sh
+Verified that the logout link works as expected. Once the redirect happens, the Account drop-down is replaced by the Log in link, which is what gets asserted in the last three lines of the test.
+```
+
+8.18 By checking the site cookies, confirm that the session is correctly removed after logging out.
+```sh
+The session is correctly removed after the log out action
+```
