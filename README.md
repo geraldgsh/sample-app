@@ -1109,4 +1109,13 @@ Session expires on closure
 
 ```
 
+8.10 Using the cookie inspector in your browser (Section 8.2.1.1), remove the session cookie and confirm that the layout links revert to the non-logged-in state.
+```sh
+After deleting the cookies, the "Account" menu is gone, and is replaced by the "Log in" button.
+```
+
+8.11 Log in again, confirming that the layout links change correctly. Then quit your browser and start it again to confirm that the layout links revert to the non-logged-in state. (If your browser has a “remember where I left off” feature that automatically restores the session, be sure to disable it in this step (Box 1.1).)
+```sh
+Yes, page reverts back to non-logged in state
+```
 
