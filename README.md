@@ -1119,3 +1119,38 @@ After deleting the cookies, the "Account" menu is gone, and is replaced by the "
 Yes, page reverts back to non-logged in state
 ```
 
+8.12 Delete the bang ! in the Session helper’s logged_in? method and confirm that the test in Listing 8.23 is red.
+```sh
+rails test test/integration/users_login_test.rb
+# Running:
+
+E
+
+Error:
+UsersLoginTest#test_login_with_valid_information:
+ActionView::Template::Error: undefined method `logged_in?' for #<#<Class:0x00007ffff2ba1dd8>:0x00007ffff2d1a570>
+Did you mean?  log_in
+    app/views/layouts/_header.html.erb:8
+    app/views/layouts/application.html.erb:9
+    test/integration/users_login_test.rb:10:in `block in <class:UsersLoginTest>'
+
+
+rails test test/integration/users_login_test.rb:9
+
+
+
+Finished in 1.522715s, 0.6567 runs/s, 0.0000 assertions/s.
+1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
+```
+
+8.13 Restore the ! to get back to green.
+```sh
+rails test test/integration/users_login_test.rb
+
+# Running:
+
+.
+
+Finished in 1.776740s, 0.5628 runs/s, 3.3770 assertions/s.
+1 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
