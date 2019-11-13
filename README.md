@@ -1121,6 +1121,14 @@ Yes, page reverts back to non-logged in state
 
 8.12 Delete the bang ! in the Session helper’s logged_in? method and confirm that the test in Listing 8.23 is red.
 ```sh
+
+app/helpers/sessions_helper.rb
+
+def logged_in?
+    current_user.nil?
+end
+
+
 rails test test/integration/users_login_test.rb
 # Running:
 
@@ -1145,6 +1153,12 @@ Finished in 1.522715s, 0.6567 runs/s, 0.0000 assertions/s.
 
 8.13 Restore the ! to get back to green.
 ```sh
+def logged_in?
+    current_user.nil?
+end
+
+app/helpers/sessions_helper.rb
+
 rails test test/integration/users_login_test.rb
 
 # Running:
@@ -1153,4 +1167,62 @@ rails test test/integration/users_login_test.rb
 
 Finished in 1.776740s, 0.5628 runs/s, 3.3770 assertions/s.
 1 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
+
+8.14 s the test suite red or green if you comment out the log_in line in Listing 8.25?
+```sh
+def logged_in?
+    current_user.nil?
+end
+
+app/helpers/sessions_helper.rb
+
+rails test test/integration/users_login_test.rb
+
+Run options: --seed 45848
+
+# Running:
+
+.
+
+Finished in 136.614150s, 0.0073 runs/s, 0.0439 assertions/s.
+1 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
+
+8.15 By using your text editor’s ability to comment out code, toggle back and forth between commenting out code in Listing 8.25?
+```sh
+rails test
+
+Run options: --seed 33546
+
+# Running:
+
+.................F
+
+Failure:
+UsersSignupTest#test_valid_signup_information [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/integration/users_signup_test.rb:15]:
+Expected false to be truthy.
+
+
+rails test test/integration/users_signup_test.rb:5
+
+..
+
+Finished in 2.313372s, 8.6454 runs/s, 18.1553 assertions/s.
+20 runs, 42 assertions, 1 failures, 0 errors, 0 skips
+```
+
+8.16 By using your text editor’s ability to comment out code, toggle back and forth between commenting out code in Listing 8.25 and confirm that the test suite toggles between red and green. (You will need to save the file between toggles.)
+```sh 
+It's confirmed that if we comment out that log_in line the tests will be red, and if we leave it there without commenting, the tests will be green.
+```
+
+8.17 Confirm in a browser that the “Log out” link causes the correct changes in the site layout. What is the correspondence between these changes and the final three steps in Listing 8.31?
+```sh
+Verified that the logout link works as expected. Once the redirect happens, the Account drop-down is replaced by the Log in link, which is what gets asserted in the last three lines of the test.
+```
+
+8.18 By checking the site cookies, confirm that the session is correctly removed after logging out.
+```sh
+The session is correctly removed after the log out action
 ```
