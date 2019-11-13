@@ -1042,3 +1042,26 @@ $ rails routes | grep 'sessions#' | wc -l
 Because in the form_for we defined the key url: and the value login_path to the hash, causing the URL to be posting to /login. And in the routes file we defined that the post to /login is routed to the create action in the sessions controller.
 ````
 
+8.4 Using the Rails console, confirm each of the values in Table 8.2. Start with user = nil, and then use user = User.first. Hint: To coerce the result to a boolean value, use the bang-bang trick from Section 4.2.3, as in !!(user && user.authenticate('foobar')).
+```sh
+>> user = nil
+=> nil
+>> !!(user && user.authenticate('buzzword'))
+=> false
+>>
+>> user = User.first
+  User Load (0.5ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Batman Robin", email: "batman@email.com", created_at: "2019-11-12 22:16:04", updated_at: "2019-11-12 22:16:04", password_digest: [FILTERED]>
+>> !!(user && user.authenticate('buzzword'))
+=> true
+>> !!(user && user.authenticate('buzzwor'))
+=> false
+```
+
+8.5 Verify in your browser that the sequence from Section 8.1.4 works correctly, i.e., that the flash message disappears when you click on a second page.
+```sh
+YEs, message disappears
+```
+
+
+
