@@ -1460,3 +1460,18 @@ Edit works fine
 ```sh
 Image is still default
 ```
+
+10.7 As noted above, by default before filters apply to every action in a controller, which in our cases is an error (requiring, e.g., that users log in to hit the signup page, which is absurd). By commenting out the only: hash in Listing 10.15, confirm that the test suite catches this error.
+```sh
+rails test
+
+Failure:
+UsersControllerTest#test_should_redirect_update_when_not_logged_in [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/controllers/users_controller_test.rb:24]:
+Expected response to be a redirect to <http://www.example.com/login> but was a redirect to <http://www.example.com/users/762146111>.
+Expected "http://www.example.com/login" to be === "http://www.example.com/users/762146111".
+
+Failure:
+UsersControllerTest#test_should_redirect_edit_when_not_logged_in [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/controllers/users_controller_test.rb:16]:
+Expected true to be nil or false
+
+```
