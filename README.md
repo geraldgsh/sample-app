@@ -1356,3 +1356,53 @@ test/integration/users_login_test.rb
 .
 .
 .
+
+rails test
+Run options: --seed 14146
+
+# Running:
+
+.........................
+Finished in 1.939977s, 12.8868 runs/s, 28.3509 assertions/s.
+25 runs, 55 assertions, 0 failures, 0 errors, 0 ski
+```
+
+9.12 Verify by removing the authenticated? expression in Listing 9.33 that the second test in Listing 9.31 fails, thereby confirming that it tests the right thing.
+```sh
+rails test
+
+Running via Spring preloader in process 1052
+Run options: --seed 51566
+
+# Running:
+
+E
+
+Error:
+SessionsHelperTest#test_current_user_returns_right_user_when_session_is_nil:
+NoMethodError: undefined method `user' for #<SessionsHelperTest:0x00007fb90c4fb1a0>
+    app/helpers/sessions_helper.rb:20:in `current_user'
+    test/helpers/sessions_helper_test.rb:11:in `block in <class:SessionsHelperTest>'
+
+
+rails test test/helpers/sessions_helper_test.rb:10
+
+E
+
+Error:
+SessionsHelperTest#test_current_user_returns_nil_when_remember_digest_is_wrong:
+NoMethodError: undefined method `user' for #<SessionsHelperTest:0x00007fb90c5501c8>
+    app/helpers/sessions_helper.rb:20:in `current_user'
+    test/helpers/sessions_helper_test.rb:17:in `block in <class:SessionsHelperTest>'
+
+
+rails test test/helpers/sessions_helper_test.rb:15
+
+.......................
+
+Finished in 1.635543s, 15.2854 runs/s, 31.7937 assertions/s.
+25 runs, 52 assertions, 0 failures, 2 errors, 0 skips
+
+When removing the authenticated? from the line, the second test fails
+
+```
