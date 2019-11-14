@@ -1531,4 +1531,46 @@ session[:forwarding_url] -> "http://0.0.0.0:3000/users/1/edit"
 true
 ```
 
-10.12
+10.12 We’ve now filled in all the links in the site layout. Write an integration test for all the layout links, including the proper behavior for logged-in and non-logged-in users. Hint: Use the log_in_as helper and add to the steps shown in Listing 5.32
+```sh
+# \sample-app\test\integration\site_layout_test.rb
+
+require 'test_helper'
+
+class SiteLayoutTest < ActionDispatch::IntegrationTest
+  test "layout_links" do
+    get root_path
+    assert_template 'static_pages/home'
+    assert_select "a[href=?]", root_path, count: 2
+    assert_select "a[href=?]", help_path
+    assert_select "a[href=?]", about_path
+    assert_select "a[href=?]", contact_path
+    assert_select "a[href=?]", signup_path
+
+    get contact_path
+    assert_select "title", full_title("Contact")
+
+    @user = users(:archer)
+    log_in_as(@user)
+    
+    get root_path
+    assert_template 'static_pages/home'
+    assert_select "a[href=?]", root_path, count: 2
+    assert_select "a[href=?]", help_path
+    assert_select "a[href=?]", users_path
+    assert_select "a[href=?]", user_path(@user)
+    assert_select "a[href=?]", logout_path
+    assert_select "a[href=?]", about_path
+    assert_select "a[href=?]", contact_path
+    assert_select "a[href=?]", signup_path
+
+    get users_path
+    assert_select "title", full_title("All users")
+
+    get signup_path
+    assert_select "title", full_title("Sign up")
+  end
+end
+```
+
+10.13 
