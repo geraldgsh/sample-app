@@ -1406,3 +1406,37 @@ Finished in 1.635543s, 15.2854 runs/s, 31.7937 assertions/s.
 When removing the authenticated? from the line, the second test fails
 
 ```
+
+### Chapter 10 exercise
+
+10.1 As noted above, there’s a minor security issue associated with using target="_blank" to open URLs, which is that the target site gains control of what’s known as the “window object” associated with the HTML document. The result is that the target site could potentially introduce malicious content, such as a phishing page. This is extremely unlikely to happen when linking to a reputable site like Gravatar, but it turns out that we can eliminate the risk entirely by setting the rel attribute (“relationship”) to "noopener" in the origin link. Add this attribute to the Gravatar edit link in Listing 10.2.
+```sh
+<a href="http://gravatar.com/emails" target="_blank" rel="noopener">change</a>
+```
+
+10.2 Remove the duplicated form code by refactoring the new.html.erb and edit.html.erb views to use the partial in Listing 10.5, as shown in Listing 10.6 and Listing 10.7. Note the use of the provide method, which we used before in Section 3.4.3 to eliminate duplication in the layout.3 (If you solved the exercise corresponding to Listing 7.27, this exercise won’t work exactly as written, and you’ll have to apply your technical sophistication to resolve the discrepancy. My suggestion is to use the variable-passing technique shown in Listing 10.5 to pass the needed URL from Listing 10.6 and Listing 10.7 to the form in Listing 10.5.)
+```sh
+new.html.erb
+<% provide(:title, 'Sign up') %>
+<% provide(:button_text, 'Create my account') %>
+<h1>Sign up</h1>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= render 'form', object: @user %>
+  </div>
+</div>
+
+edit.html.erb
+<% provide(:title, 'Edit user') %>
+<% provide(:button_text, 'Save changes') %>
+<h1>Update your profile</h1>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= render 'form', object: @user %>
+    <div class="gravatar_edit">
+      <%= gravatar_for @user %>
+      <a href="http://gravatar.com/emails" target="_blank" rel="noopener">change</a>
+    </div>
+  </div>
+</div>
+```
