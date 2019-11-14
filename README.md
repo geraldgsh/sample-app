@@ -1633,4 +1633,13 @@ Expected: 2
   Actual: 1
 ```
 
+10.18 Comment out the render line in Listing 10.52 and confirm that the resulting tests are red.
+````sh
+Failure:
+UsersIndexTest#test_index_including_pagination [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/integration/users_index_test.rb:15]:
+Expected at least 1 element matching "a[href="/users/14035331"]", found 0..
+Expected 0 to be >= 1.
+
+```
+
 
