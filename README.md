@@ -1573,4 +1573,29 @@ class SiteLayoutTest < ActionDispatch::IntegrationTest
 end
 ```
 
-10.13 
+10.13  Verify that trying to visit the edit page of another user results in a redirect as required by Section 10.2.2.
+```sh
+Trying to access another user's edit page redirects us back to the root page.
+```
+
+10.14 Confirm at the console that setting the page to nil pulls out the first page of users.
+```sh
+Confirmed!
+
+>> User.paginate(page: nil)
+   (0.6ms)  SELECT sqlite_version(*)
+  User Load (0.4ms)  SELECT "users".* FROM "users" LIMIT ? OFFSET ?  [["LIMIT", 11], ["OFFSET", 0]]
+   (0.3ms)  SELECT COUNT(*) FROM "users"
+=> #<ActiveRecord::Relation [#<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 20:08:47", updated_at: "2019-11-14 20:08:47", password_digest: [FILTERED], remember_digest: nil>, #<User id: 2, name: "Johanna Brakus", email: "example-1@railstutorial.org", created_at: "2019-11-14 20:08:47", updated_at: "2019-11-14 20:08:47", password_digest: [FILTERED], remember_digest: nil>, #<User id: 3, name: "Josefina Schumm", email: "example-2@railstutorial.org", created_at: "2019-11-14 20:08:48", updated_at: "2019-11-14 20:08:48", password_digest: [FILTERED], remember_digest: nil>, #<User id: 4, name: "Pinkie Rippin", email: "example-3@railstutorial.org", created_at: "2019-11-14 20:08:48", updated_at: "2019-11-14 20:08:48", password_digest: [FILTERED], remember_digest: nil>, #<User id: 5, name: "Jessie Friesen", email: "example-4@railstutorial.org", created_at: "2019-11-14 20:08:48", updated_at: "2019-11-14 20:08:48", password_digest: [FILTERED], remember_digest: nil>, #<User id: 6, name: "Dr. Kristy Gerhold", email: "example-5@railstutorial.org", created_at: "2019-11-14 20:08:48", updated_at: "2019-11-14 20:08:48", password_digest: [FILTERED], remember_digest: nil>, #<User id: 7, name: "Derick Champlin", email: "example-6@railstutorial.org", created_at: "2019-11-14 20:08:49", updated_at: "2019-11-14 20:08:49", password_digest: [FILTERED], remember_digest: nil>, #<User id: 8, name: "Una McCullough", email: "example-7@railstutorial.org", created_at: "2019-11-14 20:08:49", updated_at: "2019-11-14 20:08:49", password_digest: [FILTERED], remember_digest: nil>, #<User id: 9, name: "Noemy Lehner", email: "example-8@railstutorial.org", created_at: "2019-11-14 20:08:49", updated_at: "2019-11-14 20:08:49", password_digest: [FILTERED], remember_digest: nil>, #<User id: 10, name: "Dorothy Auer", email: "example-9@railstutorial.org", created_at: "2019-11-14 20:08:49", updated_at: "2019-11-14 20:08:49", password_digest: [FILTERED], remember_digest: nil>, ...]>
+```
+
+10.15  What is the Ruby class of the pagination object? How does it compare to the class of User.all?
+```sh
+> User.paginate(page: nil).class
+ => User::ActiveRecord_Relation
+
+> User.all.class
+ => User::ActiveRecord_Relation
+
+Both of them have the same father class
+```
