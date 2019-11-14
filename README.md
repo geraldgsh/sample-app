@@ -1318,3 +1318,41 @@ The checkbox is working and it saves the remember_token and the user_id in the s
 >>
 ```
 
+9.11 As mentioned above, the application currently doesn’t have any way to access the virtual remember_token attribute in the integration test in Listing 9.25. It is possible, though, using a special test method called assigns. Inside a test, you can access instance variables defined in the controller by using assigns with the corresponding symbol. For example, if the create action defines an @user variable, we can access it in the test using assigns(:user). Right now, the Sessions controller create action defines a normal (non-instance) variable called user, but if we change it to an instance variable we can test that cookies correctly contains the user’s remember token. By filling in the missing elements in Listing 9.27 and Listing 9.28 (indicated with question marks ? and FILL_IN), complete this improved test of the “remember me” checkbox.
+```sh
+
+app/controllers/sessions_controller.rb
+
+.
+.
+.
+def create
+    @user = User.find_by(email: params[:session][:email].downcase)
+    if @user && @user.authenticate(params[:session][:password])
+      # Log the user in and redirect to the user's show page.
+      log_in @user
+      params[:session][:remember_me] == '1' ? remember(@user) : forget(@user)
+      # remember user
+      redirect_to @user
+    else
+      # Create an error message.
+      flash.now[:danger] = 'Invalid email/password combination' # Not quite right!
+      render 'new'
+    end
+  end
+.
+.
+.
+
+test/integration/users_login_test.rb
+
+.
+.
+.
+  test "login with remembering" do
+    log_in_as(@user, remember_me: '1')
+    assert_equal cookies['remember_token'], assigns(:user).remember_token
+  end
+.
+.
+.
