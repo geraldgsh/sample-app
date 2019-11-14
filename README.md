@@ -1642,4 +1642,49 @@ Expected 0 to be >= 1.
 
 ```
 
+10.19  By issuing a PATCH request directly to the user path as shown in Listing 10.56, verify that the admin attribute isn’t editable through the web. To be sure your test is covering the right thing, your first step should be to add admin to the list of permitted parameters in user_params so that the initial test is red.
+```sh
+# test/controllers/users_controller_test.rb
 
+Tests passed
+
+test "should not allow the admin attribute to be edited via the web" do
+    log_in_as(@other_user)
+    assert_not @other_user.admin?
+    patch user_path(@other_user), params: {
+        user: { password: @other_user.password,
+                password_confirmation: @other_user.password,
+                admin: true } }
+    assert_not @other_user.admin?
+  end
+
+```
+
+10.20 As the admin user, destroy a few sample users through the web interface. What are the corresponding entries in the server log?
+```sh
+Started DELETE "/users/99" for ::1 at 2019-11-15 05:58:09 +0800
+   (0.1ms)  SELECT sqlite_version(*)
+Processing by UsersController#destroy as HTML
+  Parameters: {"authenticity_token"=>"96yf+VFHQtUC7i20i9vBjrCJAkPNIUjeEoB+xpMG4VGH0zSqmFb9XBe9lWL0HYDiG6yu4LF7OCsTwb257BGIsA==", "id"=>"99"}
+  User Load (0.6ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+  ↳ app/helpers/sessions_helper.rb:22:in `current_user'
+  User Load (0.3ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 99], ["LIMIT", 1]]
+  ↳ app/controllers/users_controller.rb:42:in `destroy'
+   (0.2ms)  begin transaction
+  ↳ app/controllers/users_controller.rb:42:in `destroy'
+  User Destroy (2.1ms)  DELETE FROM "users" WHERE "users"."id" = ?  [["id", 99]]
+  ↳ app/controllers/users_controller.rb:42:in `destroy'
+   (3.4ms)  commit transaction
+  ↳ app/controllers/users_controller.rb:42:in `destroy'
+Redirected to http://localhost:3000/users
+Completed 302 Found in 40ms (ActiveRecord: 8.3ms | Allocations: 12533)
+```
+
+10.21 By commenting out the admin user before filter in Listing 10.59, confirm that the tests go red.
+```sh
+Failure:
+UsersControllerTest#test_should_redirect_destroy_when_logged_in_as_a_non-admin [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/controllers/users_controller_test.rb:67]:
+"User.count" didn't change by 0.
+Expected: 34
+  Actual: 33
+```
