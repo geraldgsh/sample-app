@@ -1599,3 +1599,38 @@ Confirmed!
 
 Both of them have the same father class
 ```
+
+10.16 By commenting out the pagination links in Listing 10.45, confirm that the test in Listing 10.48 goes red.
+```sh
+rails test
+
+Failure:
+UsersIndexTest#test_index_including_pagination [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/integration/users_index_test.rb:13]:
+Expected at least 1 element matching "div.pagination", found 0..
+Expected 0 to be >= 1.
+```
+
+10.17 Confirm that commenting out only one of the calls to will_paginate leaves the tests green. How would you test for the presence of both sets of will_paginate links? Hint: Use a count from Table 5.2.
+```sh
+rails test
+
+Run options: --seed 18591
+
+# Running:
+
+.............................
+
+Finished in 2.984382s, 11.3926 runs/s, 41.5496 assertions/s.
+34 runs, 124 assertions, 0 failures, 0 errors, 0 skips
+
+assert_select 'div.pagination', count: 2
+
+>> rails test
+Failure:
+UsersIndexTest#test_index_including_pagination [/Users/felipekosouski/Workspace/Web5/sample-app/test/integration/users_index_test.rb:12]:
+Expected exactly 2 elements matching "div.pagination", found 1..
+Expected: 2
+  Actual: 1
+```
+
+
