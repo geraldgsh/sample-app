@@ -1440,3 +1440,23 @@ edit.html.erb
   </div>
 </div>
 ```
+
+10.3 Confirm by submitting various invalid combinations of username, email, and password that the edit form won’t accept invalid submissions.
+```sh
+It is confirmed that by submitting wrong values, the form doesn't accept them.
+```
+
+10.4 Add a line in Listing 10.9 to test for the correct number of error messages. Hint: Use an assert_select (Table 5.2) that tests for a div with class alert containing the text “The form contains 4 errors.”
+```sh
+assert_select "div.alert", text: "The form contains 4 errors."
+```
+
+10.5 Double-check that you can now make edits by making a few changes on the development version of the application.
+```sh
+Edit works fine
+```
+
+10.6 What happens when you change the email address to one without an associated Gravatar?
+```sh
+Image is still default
+```
