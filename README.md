@@ -1688,3 +1688,62 @@ UsersControllerTest#test_should_redirect_destroy_when_logged_in_as_a_non-admin [
 Expected: 34
   Actual: 33
 ```
+
+### Chapter 11
+
+11.1 Verify that the test suite is still green.
+```sh
+rails test
+
+# Running:
+
+..............
+Finished in 20.204802s, 1.8807 runs/s, 7.9684 assertions/s.
+38 runs, 161 assertions, 0 failures, 0 errors, 0 skips
+```
+
+11.2 Why does Table 11.2 list the _url form of the named route instead of the _path form? Hint: We’re going to use it in an email.
+```sh
+Because it will use resources from out of the app domain
+```
+
+11.3 Verify that the test suite is still green after the changes made in this section.
+```sh
+rails test
+# Running:
+
+..............
+Finished in 9.445620s, 4.0230 runs/s, 17.0449 assertions/s.
+38 runs, 161 assertions, 0 failures, 0 errors, 0 skips
+
+```
+
+11.4 By instantiating a User object in the console, confirm that calling the create_activation_digest method raises a NoMethodError due to its being a private method. What is the value of the user’s activation digest?
+```sh
+>> user = User.first
+  User Load (0.7ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 21:23:47", updated_at: "2019-11-14 21:23:47", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: nil, activated: false, activated_at: nil>
+>> user.create_activation_digest
+Traceback (most recent call last):
+        1: from (irb):3
+NoMethodError (undefined method `create_activation_digest' for #<User:0x00007fffc34751b0>)
+Did you mean?  restore_activation_digest!
+```
+
+
+11.5 In Listing 6.34, we saw that email downcasing can be written more simply as email.downcase! (without any assignment). Make this change to the downcase_email method in Listing 11.3 and verify by running the test suite that it works.
+```sh
+def downcase_email
+    email.downcase!
+end
+
+rails test
+# Running:
+
+..............
+Finished in 9.445620s, 4.0230 runs/s, 17.0449 assertions/s.
+38 runs, 161 assertions, 0 failures, 0 errors, 0 skips
+
+```
+
+
