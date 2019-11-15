@@ -1898,4 +1898,36 @@ Q65wTYfu69jdJhwJdZXFzg
 => #<User id: 103, name: "christian bale", email: "christianbale@email.com", created_at: "2019-11-15 15:44:14", updated_at: "2019-11-15 17:26:19", password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: "$2a$12$RbN/dZHrf4e5SIClljKf6eG4ZaPKL6zmqcYVQJarcfC...", activated: true, activated_at: "2019-11-15 17:26:19">
 ```
 
-11.17
+11.17 In Listing 11.35, the activate method makes two calls to the update_attribute, each of which requires a separate database transaction. By filling in the template shown in Listing 11.39, replace the two update_attribute calls with a single call to update_columns, which hits the database only once. After making the changes, verify that the test suite is still green.
+```sh
+def activate
+    update_columns(activated: true, activated_at: Time.zone.now)
+end
+
+rails test
+
+Running via Spring preloader in process 2347
+Run options: --seed 1796
+
+# Running:
+
+...........
+
+Finished in 1.878608s, 21.2924 runs/s, 95.8157 assertions/s.
+40 runs, 180 assertions, 0 failures, 0 errors, 0 skips
+```
+
+11.18 Right now all users are displayed on the user index page at /users and are visible via the URL /users/:id, but it makes sense to show users only if they are activated. Arrange for this behavior by filling in the template shown in Listing 11.40.9 (This uses the Active Record where method, which we’ll learn more about in Section 13.3.3.)
+```sh
+def index
+    @users = User.where(activated: true).paginate(page: params[:page])
+end
+
+def show
+    @user = User.find(params[:id])
+    redirect_to root_url and return unless @user.activated
+end
+```
+
+11.19 To test the code in the previous exercise, write integration tests for both /users and /users/:id.
+
