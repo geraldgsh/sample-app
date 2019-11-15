@@ -1,3 +1,5 @@
+Rails.application.routes.default_url_options[:host] = "XXX"
+
 Rails.application.routes.draw do
   get    'sessions/new'
   get    'users/new'

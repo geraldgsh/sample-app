@@ -1746,4 +1746,50 @@ Finished in 9.445620s, 4.0230 runs/s, 17.0449 assertions/s.
 
 ```
 
+11.6 At the console, verify that the escape method in the CGI module escapes out the email address as shown in Listing 11.15. What is the escaped value of the string "Don't panic!"?
+```sh
+>> CGI.escape('foo@example.com')
+=> "foo%40example.com"
+```
 
+11.7 Preview the email templates in your browser. What do the Date fields read for your previews?
+```sh
+Date: Mon, 30 Oct 2017 16:27:40 +0000
+```
+
+11.8 Preview the email templates in your browser. What do the Date fields read for your previews?
+```sh
+From:
+noreply@example.com
+To:
+example@railstutorial.org
+Date:
+Fri, 15 Nov 2019 15:16:12 +0000
+Subject:
+Account activation
+```
+
+11.9 Verify that the full test suite is still green.
+```sh
+rails test
+
+Running via Spring preloader in process 872
+Run options: --seed 26218
+
+# Running:
+
+...........
+
+Finished in 1.797517s, 21.6966 runs/s, 94.5749 assertions/s.
+39 runs, 170 assertions, 0 failures, 0 errors, 0 skips
+```
+
+11.10 Confirm that the test goes red if you remove the call to CGI.escape in Listing 11.20.
+```sh
+assert_match user.email,  mail.body.encoded
+Failure:
+UserMailerTest#test_account_activation [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/mailers/user_mailer_test.rb:14]:
+Expected /michael@example\.com/ to match # encoding: US-ASCII
+#    valid: true
+"\r\n----==_mimepart_5dcec4891e0fd_3f83fffe0b37994396ae\r\nContent-Type: text/plain;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\nHi Michael Example,\r\n\r\nWelcome to the Sample App! Click on the link below to activate your account:\r\n\r\nhttp://example.com/account_activations/ggyeXYyhKYwx6_2grj_NsQ/edit?email=michael%40example.com\r\n\r\n----==_mimepart_5dcec4891e0fd_3f83fffe0b37994396ae\r\nContent-Type: text/html;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n    <style>\r\n      /* Email styles need to be inline */\r\n    </style>\r\n  </head>\r\n\r\n  <body>\r\n    <h1>User#account_activation</h1>\r\n\r\n<p>\r\n  , find me in app/views/user_mailer/account_activation.html.erb\r\n</p>\r\n\r\n  </body>\r\n</html>\r\n\r\n----==_mimepart_5dcec4891e0fd_3f83fffe0b37994396ae--\r\n".
+```
