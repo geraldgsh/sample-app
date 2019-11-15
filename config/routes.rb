@@ -1,4 +1,4 @@
-Rails.application.routes.default_url_options[:host] = "XXX"
+Rails.application.routes.default_url_options[:host] = "localhost:3000"
 
 Rails.application.routes.draw do
   get    'sessions/new'

@@ -1787,9 +1787,115 @@ Finished in 1.797517s, 21.6966 runs/s, 94.5749 assertions/s.
 11.10 Confirm that the test goes red if you remove the call to CGI.escape in Listing 11.20.
 ```sh
 assert_match user.email,  mail.body.encoded
+
 Failure:
 UserMailerTest#test_account_activation [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/mailers/user_mailer_test.rb:14]:
 Expected /michael@example\.com/ to match # encoding: US-ASCII
 #    valid: true
 "\r\n----==_mimepart_5dcec4891e0fd_3f83fffe0b37994396ae\r\nContent-Type: text/plain;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\nHi Michael Example,\r\n\r\nWelcome to the Sample App! Click on the link below to activate your account:\r\n\r\nhttp://example.com/account_activations/ggyeXYyhKYwx6_2grj_NsQ/edit?email=michael%40example.com\r\n\r\n----==_mimepart_5dcec4891e0fd_3f83fffe0b37994396ae\r\nContent-Type: text/html;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n    <style>\r\n      /* Email styles need to be inline */\r\n    </style>\r\n  </head>\r\n\r\n  <body>\r\n    <h1>User#account_activation</h1>\r\n\r\n<p>\r\n  , find me in app/views/user_mailer/account_activation.html.erb\r\n</p>\r\n\r\n  </body>\r\n</html>\r\n\r\n----==_mimepart_5dcec4891e0fd_3f83fffe0b37994396ae--\r\n".
 ```
+
+11.11 Sign up as a new user and verify that you’re properly redirected. What is the content of the generated email in the server log? What is the value of the activation token?
+```sh
+Redirects to root page after signup
+
+Date: Fri, 15 Nov 2019 23:44:15 +0800
+From: noreply@example.com
+To: christianbale@email.com
+Message-ID: <5dcec7cf2b33c_2303fffed6d70a488240@GGOH-DELL.mail>
+Subject: Account activation
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5dcec7cf295fe_2303fffed6d70a4881de";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+----==_mimepart_5dcec7cf295fe_2303fffed6d70a4881de
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hi christian bale,
+
+Welcome to the Sample App! Click on the link below to activate your account:
+
+http://XXX/account_activations/Q65wTYfu69jdJhwJdZXFzg/edit?email=christianbale%40email.com
+
+----==_mimepart_5dcec7cf295fe_2303fffed6d70a4881de
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      /* Email styles need to be inline */
+    </style>
+  </head>
+
+  <body>
+    <h1>User#account_activation</h1>
+
+<p>
+  , find me in app/views/user_mailer/account_activation.html.erb
+</p>
+
+  </body>
+</html>
+
+----==_mimepart_5dcec7cf295fe_2303fffed6d70a4881de--
+
+Redirected to http://localhost:3000/
+Completed 302 Found in 1016ms (ActiveRecord: 161.3ms | Allocations: 27909)
+
+```
+
+11.12 Verify at the console that the new user has been created but that it is not yet activated.
+```sh
+>> user = User.find_by_email('sallyfield@email.com')
+  User Load (0.5ms)  SELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "sallyfield@email.com"], ["LIMIT", 1]]
+=> #<User id: 102, name: "sally field", email: "sallyfield@email.com", created_at: "2019-11-15 15:41:30", updated_at: "2019-11-15 15:41:30", password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: "$2a$12$gCcLiBiALzHPS5g/3vcNtO5dBfimm6Ogo4Ma.K7rZOr...", activated: false, activated_at: nil>
+```
+
+11.13 Create and remember new user at the console. What are the user’s remember and activation tokens? What are the corresponding digests?
+```sh
+>> u = User.new(name: "Tom Cruise", email: "tom@email.com", password: "buzzword", password_confirmation: "buzzword")
+   (1.1ms)  SELECT sqlite_version(*)
+=> #<User id: nil, name: "Tom Cruise", email: "tom@email.com", created_at: nil, updated_at: nil, password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: nil, activated: false, activated_at: nil>
+>> u.valid?
+  User Exists? (0.4ms)  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER(?) LIMIT ?  [["email", "tom@email.com"], ["LIMIT", 1]]
+=> true
+>> u.save
+   (0.1ms)  begin transaction
+  User Exists? (0.5ms)  SELECT 1 AS one FROM "users" WHERE LOWER("users"."email") = LOWER(?) LIMIT ?  [["email", "tom@email.com"], ["LIMIT", 1]]
+  User Create (3.2ms)  INSERT INTO "users" ("name", "email", "created_at", "updated_at", "password_digest", "activation_digest") VALUES (?, ?, ?, ?, ?, ?)  [["name", "Tom Cruise"], ["email", "tom@email.com"], ["created_at", "2019-11-15 17:18:58.730003"], ["updated_at", "2019-11-15 17:18:58.730003"], ["password_digest", "$2a$12$wxu3aAoiVSIyhj6Dx0uLQuvyovmzgu.qFhAybsyGpf6ZV8RLzgjUC"], ["activation_digest", "$2a$12$RopL6K3H05JbM5Z2W6LsD.wHmd2BOmNNBGbm/6TerYLVl1s/W.OFq"]]
+   (4.8ms)  commit transaction
+=> true
+````
+
+11.14 Using the generalized authenticated? method from Listing 11.26, verify that the user is authenticated according to both the remember token and the activation token.
+```sh
+>> u.authenticated?(:activation, u.activation_token)
+=> true
+>> u.authenticated?(:remember, u.remember_token)
+=> false
+```
+
+11.15 Paste in the URL from the email generated in Section 11.2.4. What is the activation token?
+```sh
+http://localhost:3000/account_activations/Q65wTYfu69jdJhwJdZXFzg/edit?email=christianbale%40email.com
+
+Q65wTYfu69jdJhwJdZXFzg
+```
+
+11.16 Verify at the console that the User is authenticated according to the activation token in the URL from the previous exercise. Is the user now activated?
+```sh
+>> user = User.find(103)
+  User Load (0.8ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 103], ["LIMIT", 1]]
+=> #<User id: 103, name: "christian bale", email: "christianbale@email.com", created_at: "2019-11-15 15:44:14", updated_at: "2019-11-15 17:26:19", password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: "$2a$12$RbN/dZHrf4e5SIClljKf6eG4ZaPKL6zmqcYVQJarcfC...", activated: true, activated_at: "2019-11-15 17:26:19">
+```
+
+11.17
