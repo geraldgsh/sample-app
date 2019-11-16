@@ -1971,3 +1971,75 @@ wrong number of arguments (given 1, expected 0)
 reset_digest: nil, reset_sent_at: nil
 ```
 
+12.7 Preview the email templates in your browser. What do the Date fields read for your previews?
+```sh
+Date: Sun, 17 Nov 2019 04:53:00 +0800
+```
+
+12.8 Submit a valid email address to the new password reset form. What is the content of the generated email in the server log?
+```sh
+UserMailer#password_reset: processed outbound mail in 7.4ms
+Delivered mail 5dd061ac2e8bc_2563ffff315247057681@GGOH-DELL.mail (15.0ms)
+Date: Sun, 17 Nov 2019 04:53:00 +0800
+From: noreply@example.com
+To: example@railstutorial.org
+Message-ID: <5dd061ac2e8bc_2563ffff315247057681@GGOH-DELL.mail>
+Subject: Password reset
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5dd061ac2e159_2563ffff315247057571";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+----==_mimepart_5dd061ac2e159_2563ffff315247057571
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+To reset your password click the link below:
+
+https://localhost:3000/password_resets/2EEWaKxk3N7w82dqQsfa2A/edit?email=example%40railstutorial.org
+
+This link will expire in two hours.
+
+If you did not request your password to be reset, please ignore this email and
+your password will stay as it is.
+
+----==_mimepart_5dd061ac2e159_2563ffff315247057571
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      /* Email styles need to be inline */
+    </style>
+  </head>
+
+  <body>
+    <h1>Password reset</h1>
+
+<p>To reset your password click the link below:</p>
+
+<a href="https://localhost:3000/password_resets/2EEWaKxk3N7w82dqQsfa2A/edit?email=example%40railstutorial.org">Reset password</a>
+
+<p>This link will expire in two hours.</p>
+
+<p>
+If you did not request your password to be reset, please ignore this email and
+your password will stay as it is.
+</p>
+  </body>
+</html>
+
+----==_mimepart_5dd061ac2e159_2563ffff315247057571--
+```
+
+12.9 At the console, find the user object corresponding to the email address from the previous exercise and verify that it has valid reset_digest and reset_sent_at attributes.
+```sh
+reset_digest: "$2a$12$9HUbJy62zRCEUXc7Nx8GUugFdoQggnf0495HefmJlZk...", reset_sent_at: "2019-11-16 20:44:30"
+```
