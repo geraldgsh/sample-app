@@ -1931,4 +1931,23 @@ end
 
 11.19 To test the code in the previous exercise, write integration tests for both /users and /users/:id.
 
-development
+
+
+### Chapter 12
+
+
+12.1 Verify that the test suite is still green.
+```sh
+rails test
+# Running:
+.....................
+
+Finished in 1.620839s, 24.6786 runs/s, 111.0536 assertions/s.
+40 runs, 180 assertions, 0 failures, 0 errors, 0 skips
+
+12.2 Why does Table 12.1 list the _url form of the edit named route instead of the _path form? Hint: The answer is the same as for the similar account activations exercise (Section 11.1.1.1).
+```sh
+Because it's going to need access to a resource outside the application domain.
+```
+
+
