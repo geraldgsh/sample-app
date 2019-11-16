@@ -2065,3 +2065,13 @@ Expected /michael@example\.com/ to match # encoding: US-ASCII
 "\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671\r\nContent-Type: text/plain;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\nTo reset your password click the link below:\r\n\r\nhttp://example.com/password_resets/C7i-ZkHUp2DdRJdeHEYs7w/edit?email=michael%40example.com\r\n\r\nThis link will expire in two hours.\r\n\r\nIf you did not request your password to be reset, please ignore this email and\r\nyour password will stay as it is.\r\n\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671\r\nContent-Type: text/html;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n    <style>\r\n      /* Email styles need to be inline */\r\n    </style>\r\n  </head>\r\n\r\n  <body>\r\n    <h1>Password reset</h1>\r\n\r\n<p>To reset your password click the link below:</p>\r\n\r\n<a href=\"http://example.com/password_resets/C7i-ZkHUp2DdRJdeHEYs7w/edit?email=michael%40example.com\">Reset password</a>\r\n\r\n<p>This link will expire in two hours.</p>\r\n\r\n<p>\r\nIf you did not request your password to be reset, please ignore this email and\r\nyour password will stay as it is.\r\n</p>\r\n  </body>\r\n</html>\r\n\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671--\r\n".
 ```
 
+12.12 Follow the link in the email from the server log in Section 12.2.1.1. Does it properly render the form as shown in Figure 12.11?
+```sh
+Yes
+```
+
+12.13 What happens if you submit the form from the previous exercise?
+```sh
+The action 'update' could not be found for PasswordResetsController
+```
+
