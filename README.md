@@ -1950,4 +1950,7 @@ Finished in 1.620839s, 24.6786 runs/s, 111.0536 assertions/s.
 Because it's going to need access to a resource outside the application domain.
 ```
 
-
+12.3 Why does the form_for in Listing 12.4 use :password_reset instead of @password_reset?
+'''sh
+Because it's not referencing a specific object in the db.
+'''
