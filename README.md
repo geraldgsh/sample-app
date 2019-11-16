@@ -2043,3 +2043,25 @@ your password will stay as it is.
 ```sh
 reset_digest: "$2a$12$9HUbJy62zRCEUXc7Nx8GUugFdoQggnf0495HefmJlZk...", reset_sent_at: "2019-11-16 20:44:30"
 ```
+
+12.10 Run just the mailer tests. Are they green?
+```sh
+rails test
+
+# Running:
+
+.......................
+
+Finished in 1.355598s, 30.2450 runs/s, 137.9465 assertions/s.
+41 runs, 187 assertions, 0 failures, 0 errors, 0 skips
+```
+
+12.11 Confirm that the test goes red if you remove the second call to CGI.escape in Listing 12.12.
+```sh
+Failure:
+UserMailerTest#test_password_reset [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/mailers/user_mailer_test.rb:25]:
+Expected /michael@example\.com/ to match # encoding: US-ASCII
+#    valid: true
+"\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671\r\nContent-Type: text/plain;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\nTo reset your password click the link below:\r\n\r\nhttp://example.com/password_resets/C7i-ZkHUp2DdRJdeHEYs7w/edit?email=michael%40example.com\r\n\r\nThis link will expire in two hours.\r\n\r\nIf you did not request your password to be reset, please ignore this email and\r\nyour password will stay as it is.\r\n\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671\r\nContent-Type: text/html;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n    <style>\r\n      /* Email styles need to be inline */\r\n    </style>\r\n  </head>\r\n\r\n  <body>\r\n    <h1>Password reset</h1>\r\n\r\n<p>To reset your password click the link below:</p>\r\n\r\n<a href=\"http://example.com/password_resets/C7i-ZkHUp2DdRJdeHEYs7w/edit?email=michael%40example.com\">Reset password</a>\r\n\r\n<p>This link will expire in two hours.</p>\r\n\r\n<p>\r\nIf you did not request your password to be reset, please ignore this email and\r\nyour password will stay as it is.\r\n</p>\r\n  </body>\r\n</html>\r\n\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671--\r\n".
+```
+
