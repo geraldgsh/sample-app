@@ -2075,3 +2075,19 @@ Yes
 The action 'update' could not be found for PasswordResetsController
 ```
 
+12.14 Follow the email link from Section 12.2.1.1 again and submit mismatched passwords to the form. What is the error message?
+```sh
+Password confirmation doesn't match Password
+```
+
+
+12.15 In the console, find the user belonging to the email link, and retrieve the value of the password_digest attribute. Now submit valid matching passwords to the form shown in Figure 12.12. Did the submission appear to work? How did it affect the value of password_digest? Hint: Use user.reload to retrieve the new value.
+```sh
+before password update
+>> user.password_digest
+=> "$2a$12$L/TPXYcyVB5wrbC66tSh9.XfZLm69U2qo3/XYP23jfly7DWJO80rG"
+
+after password update
+>> user.password_digest
+=> "$2a$12$tDGJp27FegPFLw1KMJ6y5OoH2BTI6RHGAC1er5tEABWf5uMYEApxa"
+```
