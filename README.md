@@ -1954,3 +1954,20 @@ Because it's going to need access to a resource outside the application domain.
 '''sh
 Because it's not referencing a specific object in the db.
 '''
+
+12.4 Submit a valid email address to the form shown in Figure 12.6. What error message do you get?
+```sh
+The action 'create' could not be found for PasswordResetsController
+```
+
+12.5 Confirm at the console that the user in the previous exercise has valid reset_digest and reset_sent_at attributes, despite the error. What are the attribute values?
+```sh
+ArgumentError in PasswordResetsController#create
+wrong number of arguments (given 1, expected 0)
+```
+
+12.6 Confirm at the console that the user in the previous exercise has valid reset_digest and reset_sent_at attributes, despite the error. What are the attribute values?
+```sh
+reset_digest: nil, reset_sent_at: nil
+```
+
