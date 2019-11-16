@@ -2091,3 +2091,36 @@ after password update
 >> user.password_digest
 => "$2a$12$tDGJp27FegPFLw1KMJ6y5OoH2BTI6RHGAC1er5tEABWf5uMYEApxa"
 ```
+
+12.16 In Listing 12.6, the create_reset_digest method makes two calls to update_attribute, each of which requires a separate database operation. By filling in the template shown in Listing 12.20, replace the two update_attribute calls with a single call to update_columns, which hits the database only once. After making the changes, verify that the test suite is still green. (For convenience, Listing 12.20 includes the results of solving the exercise in Listing 11.39.)
+```sh
+  def create_reset_digest
+    self.reset_token = User.new_token
+    update_columns(reset_digest: User.digest(reset_token), reset_sent_at: Time.zone.now)
+  end
+```
+
+12.17 Write an integration test for the expired password reset branch in Listing 12.16 by filling in the template shown in Listing 12.21. (This code introduces response.body, which returns the full HTML body of the page.) There are many ways to test for the result of an expiration, but the method suggested by Listing 12.21 is to (case-insensitively) check that the response body includes the word “expired”.
+```sh
+assert_match (/expired/i), response.body
+
+```
+
+
+12.18 Expiring password resets after a couple of hours is a nice security precaution, but there is an even more secure solution for cases where a public computer is used. The reason is that the password reset link remains active for 2 hours and can be used even if logged out. If a user reset their password from a public machine, anyone could press the back button and change the password (and get logged in to the site). To fix this, add the code shown in Listing 12.22 to clear the reset digest on successful password update.5
+```sh
+code added
+```
+
+
+12.19 Add a line to Listing 12.18 to test for the clearing of the reset digest in the previous exercise. Hint: Combine assert_nil (first seen in Listing 9.25) with user.reload (Listing 11.33) to test the reset_digest attribute directly.
+```sh
+added lines to listing 12.18
+
+user.reload
+assert_nil user.reset_digest
+
+$ rails test
+Finished in 2.23639s
+42 tests, 210 assertions, 0 failures, 0 errors, 0 skips
+```
