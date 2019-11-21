@@ -2124,3 +2124,159 @@ $ rails test
 Finished in 2.23639s
 42 tests, 210 assertions, 0 failures, 0 errors, 0 skips
 ```
+
+### Chapter 13
+
+13.1 Using Micropost.new in the console, instantiate a new Micropost object called micropost with content “Lorem ipsum” and user id equal to the id of the first user in the database. What are the values of the magic columns created_at and updated_at?
+```sh
+nil
+
+>> micropost = Micropost.new(content: "Lorem ipsum", user_id: 1)
+   (1.0ms)  SELECT sqlite_version(*)
+=> #<Micropost id: nil, content: "Lorem ipsum", user_id: 1, created_at: nil, updated_at: nil>
+```
+
+13.2 What is micropost.user for the micropost in the previous exercise? What about micropost.user.name?
+```sh
+>> micropost.user
+  User Load (0.4ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+>> micropost.user.name
+=> "Example User"
+```
+
+13.3 Save the micropost to the database. What are the values of the magic columns now?
+```sh
+>> micropost.save
+   (0.1ms)  begin transaction
+  Micropost Create (296.8ms)  INSERT INTO "microposts" ("content", "user_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["content", "Lorem ipsum"], ["user_id", 1], ["created_at", "2019-11-21 17:24:57.982476"], ["updated_at", "2019-11-21 17:24:57.982476"]]
+   (3.1ms)  commit transaction
+=> true
+```
+
+13.4 At the console, instantiate a micropost with no user id and blank content. Is it valid? What are the full error messages?
+```sh
+>> micropost = Micropost.new
+=> #<Micropost id: nil, content: nil, user_id: nil, created_at: nil, updated_at: nil>
+>> micropost.save
+=> false
+>> micropost.errors.full_messages
+=> ["User must exist"]
+```
+
+13.5 At the console, instantiate a second micropost with no user id and content that’s too long. Is it valid? What are the full error messages?
+```sh
+>> m = Micropost.new(content: "h" * 200)
+   (1.4ms)  SELECT sqlite_version(*)
+=> #<Micropost id: nil, content: "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh...", user_id: nil, created_at: nil, updated_at: nil>
+>> m.save
+=> false
+>> m.errors.full_messages
+=> ["User must exist", "User can't be blank", "Content is too long (maximum is 140 characters)"]
+```
+
+13.6 Set user to the first user in the database. What happens when you execute the command micropost = user.microposts.create(content: "Lorem ipsum")?
+```sh
+>> user = User.first
+   (0.8ms)  SELECT sqlite_version(*)
+  User Load (0.3ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+>>
+>> micropost = user.microposts.create(content: "Lorem ipsum")
+   (0.1ms)  begin transaction
+  Micropost Create (1.8ms)  INSERT INTO "microposts" ("content", "user_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["content", "Lorem ipsum"], ["user_id", 1], ["created_at", "2019-11-21 19:13:03.393517"], ["updated_at", "2019-11-21 19:13:03.393517"]]
+   (3.6ms)  commit transaction
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+```
+
+13.7 The previous exercise should have created a micropost in the database. Confirm this by running user.microposts.find(micropost.id). What if you write micropost instead of micropost.id?
+```sh
+>> user.microposts.find(micropost.id)
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? AND "microposts"."id" = ? LIMIT ?  [["user_id", 1], ["id", 2], ["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+```
+
+13.8 What is the value of user == micropost.user? How about user.microposts.first == micropost?
+```sh
+>> user == micropost.user
+=> true
+>> user.microposts.first == micropost
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."id" ASC LIMIT ?  [["user_id", 1], ["LIMIT", 1]]
+=> false
+```
+
+13.9 How does the value of Micropost.first.created_at compare to Micropost.last.created_at?
+```sh
+>> Micropost.last.created_at
+   (0.9ms)  SELECT sqlite_version(*)
+  Micropost Load (0.6ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" ASC LIMIT ?  [["LIMIT", 1]]
+=> Thu, 21 Nov 2019 17:24:57 UTC +00:00
+>>
+
+>> Micropost.first.created_at
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" DESC LIMIT ?  [["LIMIT", 1]]
+=> Thu, 21 Nov 2019 19:13:03 UTC +00:00
+>>
+```
+
+13.10 What are the SQL queries for Micropost.first and Micropost.last? Hint: They are printed out by the console.
+```
+>> Micropost.firstt
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" DESC LIMIT ?  [["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+
+>> Micropost.last
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<Micropost id: 1, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 17:24:57", updated_at: "2019-11-21 17:24:57">
+```
+
+13.11 Let user be the first user in the database. What is the id of its first micropost? Destroy the first user in the database using the destroy method, then confirm using Micropost.find that the user’s first micropost was also destroyed.
+```sh
+>> user = User.first
+  User Load (0.5ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+
+>> micropost = Micropost.first
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" DESC LIMIT ?  [["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+
+>> user.microposts.first
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."created_at" DESC LIMIT ?  [["user_id", 1], ["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+
+>> user.destroy
+   (0.1ms)  begin transaction
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."created_at" DESC  [["user_id", 1]]
+  Micropost Destroy (290.6ms)  DELETE FROM "microposts" WHERE "microposts"."id" = ?  [["id", 2]]
+  Micropost Destroy (0.2ms)  DELETE FROM "microposts" WHERE "microposts"."id" = ?  [["id", 1]]
+  User Destroy (0.4ms)  DELETE FROM "users" WHERE "users"."id" = ?  [["id", 1]]
+   (3.3ms)  commit transaction
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+>>
+
+>> user.microposts.find(1)
+  Micropost Load (0.2ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? AND "microposts"."id" = ? ORDER BY "microposts"."created_at" DESC LIMIT ?  [["user_id", 1], ["id", 1], ["LIMIT", 1]]
+Traceback (most recent call last):
+        1: from (irb):91
+ActiveRecord::RecordNotFound (Couldn't find Micropost with 'id'=1 [WHERE "microposts"."user_id" = ?])
+```
+
+13.12 As mentioned briefly in Section 7.3.3, helper methods like time_ago_in_words are available in the Rails console via the helper object. Using helper, apply time_ago_in_words to 3.weeks.ago and 6.months.ago.
+```sh
+>> helper.time_ago_in_words(3.weeks.ago)
+=> "21 days"
+>> helper.time_ago_in_words(6.months.ago)
+=> "6 months"
+```
+
+13.13 What is the result of helper.time_ago_in_words(1.year.ago)?
+```sh
+>> helper.time_ago_in_words(1.year.ago)
+=> "about 1 year"
+```
+
+13.14 What is the Ruby class for a page of microposts? Hint: Use the code in Listing 13.23 as your model, and call the class method on paginate with the argument page: nil.
+```sh
+> user.microposts.paginate(page: nil).class
+ => Micropost::ActiveRecord_AssociationRelation
+```
