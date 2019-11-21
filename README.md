@@ -2280,3 +2280,36 @@ ActiveRecord::RecordNotFound (Couldn't find Micropost with 'id'=1 [WHERE "microp
 > user.microposts.paginate(page: nil).class
  => Micropost::ActiveRecord_AssociationRelation
 ```
+
+13.15 See if you can guess the result of running (1..10).to_a.take(6). Check at the console to see if your guess is right.
+````sh
+>> (1..10).to_a.take(6)
+=> [1, 2, 3, 4, 5, 6]
+```
+
+13.16 Is the to_a method in the previous exercise necessary?
+```sh
+No, it isn't necessary, the result is the same as in the other exercise
+
+> (1..10).take(6)
+ => [1, 2, 3, 4, 5, 6]
+```
+
+13.17 Faker has a huge number of occasionally amusing applications. By consulting the Faker documentation, learn how to print out a fake university name, a fake phone number, a fake Hipster Ipsum sentence, and a fake Chuck Norris fact.
+```sh
+Fake University name
+>> Faker::University.name
+=> "Farrell Institute"
+
+Fake phone number
+>> Faker::PhoneNumber.phone_number
+=> "1-622-402-5560"
+
+Fake hipster ipsum
+>> Faker::Hipster.sentence
+=> "Loko pinterest stumptown bicycle rights shoreditch pour-over wolf food truck next level."
+
+Fake Chuck Norris Fact
+>> Faker::ChuckNorris.fact
+=> "The class object inherits from Chuck Norris."
+```
