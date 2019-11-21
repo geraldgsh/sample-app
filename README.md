@@ -1931,4 +1931,196 @@ end
 
 11.19 To test the code in the previous exercise, write integration tests for both /users and /users/:id.
 
-development
+
+
+### Chapter 12
+
+
+12.1 Verify that the test suite is still green.
+```sh
+rails test
+# Running:
+.....................
+
+Finished in 1.620839s, 24.6786 runs/s, 111.0536 assertions/s.
+40 runs, 180 assertions, 0 failures, 0 errors, 0 skips
+
+12.2 Why does Table 12.1 list the _url form of the edit named route instead of the _path form? Hint: The answer is the same as for the similar account activations exercise (Section 11.1.1.1).
+```sh
+Because it's going to need access to a resource outside the application domain.
+```
+
+12.3 Why does the form_for in Listing 12.4 use :password_reset instead of @password_reset?
+'''sh
+Because it's not referencing a specific object in the db.
+'''
+
+12.4 Submit a valid email address to the form shown in Figure 12.6. What error message do you get?
+```sh
+The action 'create' could not be found for PasswordResetsController
+```
+
+12.5 Confirm at the console that the user in the previous exercise has valid reset_digest and reset_sent_at attributes, despite the error. What are the attribute values?
+```sh
+ArgumentError in PasswordResetsController#create
+wrong number of arguments (given 1, expected 0)
+```
+
+12.6 Confirm at the console that the user in the previous exercise has valid reset_digest and reset_sent_at attributes, despite the error. What are the attribute values?
+```sh
+reset_digest: nil, reset_sent_at: nil
+```
+
+12.7 Preview the email templates in your browser. What do the Date fields read for your previews?
+```sh
+Date: Sun, 17 Nov 2019 04:53:00 +0800
+```
+
+12.8 Submit a valid email address to the new password reset form. What is the content of the generated email in the server log?
+```sh
+UserMailer#password_reset: processed outbound mail in 7.4ms
+Delivered mail 5dd061ac2e8bc_2563ffff315247057681@GGOH-DELL.mail (15.0ms)
+Date: Sun, 17 Nov 2019 04:53:00 +0800
+From: noreply@example.com
+To: example@railstutorial.org
+Message-ID: <5dd061ac2e8bc_2563ffff315247057681@GGOH-DELL.mail>
+Subject: Password reset
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5dd061ac2e159_2563ffff315247057571";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+----==_mimepart_5dd061ac2e159_2563ffff315247057571
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+To reset your password click the link below:
+
+https://localhost:3000/password_resets/2EEWaKxk3N7w82dqQsfa2A/edit?email=example%40railstutorial.org
+
+This link will expire in two hours.
+
+If you did not request your password to be reset, please ignore this email and
+your password will stay as it is.
+
+----==_mimepart_5dd061ac2e159_2563ffff315247057571
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      /* Email styles need to be inline */
+    </style>
+  </head>
+
+  <body>
+    <h1>Password reset</h1>
+
+<p>To reset your password click the link below:</p>
+
+<a href="https://localhost:3000/password_resets/2EEWaKxk3N7w82dqQsfa2A/edit?email=example%40railstutorial.org">Reset password</a>
+
+<p>This link will expire in two hours.</p>
+
+<p>
+If you did not request your password to be reset, please ignore this email and
+your password will stay as it is.
+</p>
+  </body>
+</html>
+
+----==_mimepart_5dd061ac2e159_2563ffff315247057571--
+```
+
+12.9 At the console, find the user object corresponding to the email address from the previous exercise and verify that it has valid reset_digest and reset_sent_at attributes.
+```sh
+reset_digest: "$2a$12$9HUbJy62zRCEUXc7Nx8GUugFdoQggnf0495HefmJlZk...", reset_sent_at: "2019-11-16 20:44:30"
+```
+
+12.10 Run just the mailer tests. Are they green?
+```sh
+rails test
+
+# Running:
+
+.......................
+
+Finished in 1.355598s, 30.2450 runs/s, 137.9465 assertions/s.
+41 runs, 187 assertions, 0 failures, 0 errors, 0 skips
+```
+
+12.11 Confirm that the test goes red if you remove the second call to CGI.escape in Listing 12.12.
+```sh
+Failure:
+UserMailerTest#test_password_reset [/mnt/d/google_drive/microverse/4.rails/2.lets_get_building/sample-app/test/mailers/user_mailer_test.rb:25]:
+Expected /michael@example\.com/ to match # encoding: US-ASCII
+#    valid: true
+"\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671\r\nContent-Type: text/plain;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\nTo reset your password click the link below:\r\n\r\nhttp://example.com/password_resets/C7i-ZkHUp2DdRJdeHEYs7w/edit?email=michael%40example.com\r\n\r\nThis link will expire in two hours.\r\n\r\nIf you did not request your password to be reset, please ignore this email and\r\nyour password will stay as it is.\r\n\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671\r\nContent-Type: text/html;\r\n charset=UTF-8\r\nContent-Transfer-Encoding: 7bit\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n    <style>\r\n      /* Email styles need to be inline */\r\n    </style>\r\n  </head>\r\n\r\n  <body>\r\n    <h1>Password reset</h1>\r\n\r\n<p>To reset your password click the link below:</p>\r\n\r\n<a href=\"http://example.com/password_resets/C7i-ZkHUp2DdRJdeHEYs7w/edit?email=michael%40example.com\">Reset password</a>\r\n\r\n<p>This link will expire in two hours.</p>\r\n\r\n<p>\r\nIf you did not request your password to be reset, please ignore this email and\r\nyour password will stay as it is.\r\n</p>\r\n  </body>\r\n</html>\r\n\r\n----==_mimepart_5dd0652ca9190_3323fffdcef399c47671--\r\n".
+```
+
+12.12 Follow the link in the email from the server log in Section 12.2.1.1. Does it properly render the form as shown in Figure 12.11?
+```sh
+Yes
+```
+
+12.13 What happens if you submit the form from the previous exercise?
+```sh
+The action 'update' could not be found for PasswordResetsController
+```
+
+12.14 Follow the email link from Section 12.2.1.1 again and submit mismatched passwords to the form. What is the error message?
+```sh
+Password confirmation doesn't match Password
+```
+
+
+12.15 In the console, find the user belonging to the email link, and retrieve the value of the password_digest attribute. Now submit valid matching passwords to the form shown in Figure 12.12. Did the submission appear to work? How did it affect the value of password_digest? Hint: Use user.reload to retrieve the new value.
+```sh
+before password update
+>> user.password_digest
+=> "$2a$12$L/TPXYcyVB5wrbC66tSh9.XfZLm69U2qo3/XYP23jfly7DWJO80rG"
+
+after password update
+>> user.password_digest
+=> "$2a$12$tDGJp27FegPFLw1KMJ6y5OoH2BTI6RHGAC1er5tEABWf5uMYEApxa"
+```
+
+12.16 In Listing 12.6, the create_reset_digest method makes two calls to update_attribute, each of which requires a separate database operation. By filling in the template shown in Listing 12.20, replace the two update_attribute calls with a single call to update_columns, which hits the database only once. After making the changes, verify that the test suite is still green. (For convenience, Listing 12.20 includes the results of solving the exercise in Listing 11.39.)
+```sh
+  def create_reset_digest
+    self.reset_token = User.new_token
+    update_columns(reset_digest: User.digest(reset_token), reset_sent_at: Time.zone.now)
+  end
+```
+
+12.17 Write an integration test for the expired password reset branch in Listing 12.16 by filling in the template shown in Listing 12.21. (This code introduces response.body, which returns the full HTML body of the page.) There are many ways to test for the result of an expiration, but the method suggested by Listing 12.21 is to (case-insensitively) check that the response body includes the word “expired”.
+```sh
+assert_match (/expired/i), response.body
+
+```
+
+
+12.18 Expiring password resets after a couple of hours is a nice security precaution, but there is an even more secure solution for cases where a public computer is used. The reason is that the password reset link remains active for 2 hours and can be used even if logged out. If a user reset their password from a public machine, anyone could press the back button and change the password (and get logged in to the site). To fix this, add the code shown in Listing 12.22 to clear the reset digest on successful password update.5
+```sh
+code added
+```
+
+
+12.19 Add a line to Listing 12.18 to test for the clearing of the reset digest in the previous exercise. Hint: Combine assert_nil (first seen in Listing 9.25) with user.reload (Listing 11.33) to test the reset_digest attribute directly.
+```sh
+added lines to listing 12.18
+
+user.reload
+assert_nil user.reset_digest
+
+$ rails test
+Finished in 2.23639s
+42 tests, 210 assertions, 0 failures, 0 errors, 0 skips
+```
