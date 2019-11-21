@@ -2313,3 +2313,20 @@ Fake Chuck Norris Fact
 >> Faker::ChuckNorris.fact
 => "The class object inherits from Chuck Norris."
 ```
+
+13.18 Comment out the application code needed to change the two 'h1' lines in Listing 13.28 from green to red.
+```sh
+Turns red after removing the code below
+
+<section class="user_info">
+      <h1>
+        <%#= gravatar_for @user %>
+        <%#= @user.name %>
+      </h1>
+</section>
+```
+
+13.19 Update Listing 13.28 to test that will_paginate appears only once. Hint: Refer to Table 5.2.
+```sh
+assert_select 'div.pagination', count: 1
+```
