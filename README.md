@@ -2335,3 +2335,12 @@ assert_select 'div.pagination', count: 1
 ```sh
 Because of the DRY principle in Rails, the repetition of code is a bad practice.
 ```
+
+13.21 Refactor the Home page to use separate partials for the two branches of the if-else statement.
+```sh
+<% if logged_in? %>
+  <%= render 'microposts' %>
+<% else %>
+  <%= render 'welcome' %>
+<% end %>
+```
