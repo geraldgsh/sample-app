@@ -2330,3 +2330,8 @@ Turns red after removing the code below
 ```sh
 assert_select 'div.pagination', count: 1
 ```
+
+13.20 Why is it a bad idea to leave a copy of logged_in_user in the Users controller?
+```sh
+Because of the DRY principle in Rails, the repetition of code is a bad practice.
+```
