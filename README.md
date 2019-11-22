@@ -2430,3 +2430,38 @@ $rails test
 Finished in 2.238520s, 24.1231 runs/s, 135.3573 assertions/s.
 54 runs, 303 assertions, 0 failures, 0 errors, 0 skips
 ```
+
+13.28 Upload a micropost with attached image. Does the result look too big? (If so, don’t worry; we’ll fix it in Section 13.4.3.)
+```sh
+Yes, its too big
+```
+
+13.29 Following the template in Listing 13.63, write a test of the image uploader in Section 13.4. As preparation, you should add an image to the fixtures directory (using, e.g, cp app/assets/images/rails.png test/fixtures/). The additional assertions in Listing 13.63 check both for a file upload field on the Home page and for a valid image attribute on the micropost resulting from valid submission. Note the use of the special fixture_file_upload method for uploading files as fixtures inside tests.18 Hint: To check for a valid picture attribute, use the assigns method mentioned in Section 11.3.3 to access the micropost in the create action after valid submission.
+```sh
+$rails test
+
+# Running:
+
+....................
+
+Finished in 1.779459s, 30.3463 runs/s, 170.8385 assertions/s.
+54 runs, 304 assertions, 0 failures, 0 errors, 0 skips
+```
+
+13.30 What happens if you try uploading an image bigger than 5 megabytes?
+```sh
+'Maximum file size is 4MB. Please choose a smaller file.'
+```
+
+13.31 What happens if you try uploading a file with an invalid extension?
+```sh
+Picture You are not allowed to upload "pdf" files, allowed types: jpg, jpeg, gif, png
+```
+
+13.32 Upload a large image and confirm directly that the resizing is working. Does the resizing work even if the image isn’t square?
+```sh
+```
+
+13.33 If you completed the image upload test in Listing 13.63, at this point your test suite may be giving you a confusing error message. Fix this issue by configuring CarrierWave to skip image resizing in tests using the initializer file shown in Listing 13.68.
+```sh
+```
