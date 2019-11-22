@@ -2344,3 +2344,34 @@ Because of the DRY principle in Rails, the repetition of code is a bad practice.
   <%= render 'welcome' %>
 <% end %>
 ```
+
+13.22 Use the newly created micropost UI to create the first real micropost. What are the contents of the INSERT command in the server log?
+```sh
+Started POST "/microposts" for ::1 at 2019-11-22 21:33:19 +0800
+Processing by MicropostsController#create as HTML
+  Parameters: {"authenticity_token"=>"s+3Orn7Um1IhE3VLspmozl88TDKH+mGnZ+99xHig4W934ezp29/S5FosjvupLH6IvlMYs1Vlt1KeWCp6/R9qwg==", "micropost"=>{"content"=>"bother\r\n"}, "commit"=>"Post"}
+  User Load (0.3ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+  ↳ app/helpers/sessions_helper.rb:22:in `current_user'
+   (0.3ms)  begin transaction
+  ↳ app/controllers/microposts_controller.rb:6:in `create'
+  Micropost Create (1.9ms)  INSERT INTO "microposts" ("content", "user_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["content", "bother\r\n"], ["user_id", 1], ["created_at", "2019-11-22 13:33:19.851703"], ["updated_at", "2019-11-22 13:33:19.851703"]]
+  ↳ app/controllers/microposts_controller.rb:6:in `create'
+   (5.2ms)  commit transaction
+  ↳ app/controllers/microposts_controller.rb:6:in `create'
+Redirected to http://localhost:3000/
+Completed 302 Found in 24ms (ActiveRecord: 7.6ms | Allocations: 6441)
+```
+
+13.23 In the console, set user to the first user in the database. Confirm that the values of Micropost.where("user_id = ?", user.id), user.microposts, and user.feed are all the same. Hint: It’s probably easiest to compare directly using ==.
+```sh
+>> user = User.first
+   (0.8ms)  SELECT sqlite_version(*)
+  User Load (0.4ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Micheal", email: "example@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$75dzqD2K32xQkT2xo5ywVuF62CIXwRGTuuI0ELM8r1P...", activated: true, activated_at: "2019-11-22 12:48:00", reset_digest: nil, reset_sent_at: nil>
+>>
+>>
+>> Micropost.where("user_id = ?", user.id) == user.microposts
+  Micropost Load (0.5ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."created_at" DESC  [["user_id", 1]]
+  Micropost Load (0.2ms)  SELECT "microposts".* FROM "microposts" WHERE (user_id = 1) ORDER BY "microposts"."created_at" DESC
+=> true
+```
