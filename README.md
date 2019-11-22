@@ -2375,3 +2375,27 @@ Completed 302 Found in 24ms (ActiveRecord: 7.6ms | Allocations: 6441)
   Micropost Load (0.2ms)  SELECT "microposts".* FROM "microposts" WHERE (user_id = 1) ORDER BY "microposts"."created_at" DESC
 => true
 ```
+
+13.24 Create a new micropost and then delete it. What are the contents of the DELETE command in the server log?
+```sh
+Started DELETE "/microposts/139" for ::1 at 2019-11-22 21:42:07 +0800
+Processing by MicropostsController#destroy as HTML
+  Parameters: {"authenticity_token"=>"aamNWFNi6G0kpesCkTExIsdpyLza+/wjNZhMx2rbcVmtpa8f9mmh21+aELKKhOdkJgacPQhkKtbMLxt572T69A==", "id"=>"139"}
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+  ↳ app/helpers/sessions_helper.rb:22:in `current_user'
+  Micropost Load (0.2ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? AND "microposts"."id" = ? ORDER BY "microposts"."created_at" DESC LIMIT ?  [["user_id", 1], ["id", 139], ["LIMIT", 1]]
+  ↳ app/controllers/microposts_controller.rb:29:in `correct_user'
+   (0.0ms)  begin transaction
+  ↳ app/controllers/microposts_controller.rb:17:in `destroy'
+  Micropost Destroy (1.3ms)  DELETE FROM "microposts" WHERE "microposts"."id" = ?  [["id", 139]]
+  ↳ app/controllers/microposts_controller.rb:17:in `destroy'
+   (3.1ms)  commit transaction
+  ↳ app/controllers/microposts_controller.rb:17:in `destroy'
+Redirected to http://localhost:3000/
+Completed 302 Found in 16ms (ActiveRecord: 4.9ms | Allocations: 5363)
+```
+
+13.25 Confirm directly in the browser that the line redirect_to request.referrer || root_url can be replaced with the line redirect_back(fallback_location: root_url). (This method was added in Rails 5.)
+```sh
+Yes, the succes message is flashed.
+```
