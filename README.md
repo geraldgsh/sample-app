@@ -2399,3 +2399,34 @@ Completed 302 Found in 16ms (ActiveRecord: 4.9ms | Allocations: 5363)
 ```sh
 Yes, the succes message is flashed.
 ```
+
+13.26 For each of the four scenarios indicated by comments in Listing 13.55 (starting with “Invalid submission”), comment out application code to get the corresponding test to red, then uncomment to get back to green.
+```sh
+Done
+```
+
+13.27 Add tests for the sidebar micropost count (including proper pluralization). Listing 13.57 will help get you started.
+```sh
+test "micropost sidebar count" do
+    log_in_as(@user)
+    get root_path
+    assert_match "#{@user.microposts.count} microposts", response.body
+    # User with zero microposts
+    other_user = users(:malory)
+    log_in_as(other_user)
+    get root_path
+    assert_match "0 microposts", response.body
+    other_user.microposts.create!(content: "A micropost")
+    get root_path
+    assert_match "1 micropost", response.body
+end
+
+$rails test
+
+# Running:
+
+....................
+
+Finished in 2.238520s, 24.1231 runs/s, 135.3573 assertions/s.
+54 runs, 303 assertions, 0 failures, 0 errors, 0 skips
+```
