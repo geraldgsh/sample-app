@@ -2460,8 +2460,46 @@ Picture You are not allowed to upload "pdf" files, allowed types: jpg, jpeg, gif
 
 13.32 Upload a large image and confirm directly that the resizing is working. Does the resizing work even if the image isn’t square?
 ```sh
+Yes, resizing works
 ```
 
 13.33 If you completed the image upload test in Listing 13.63, at this point your test suite may be giving you a confusing error message. Fix this issue by configuring CarrierWave to skip image resizing in tests using the initializer file shown in Listing 13.68.
 ```sh
+Done
+```
+
+13.34 Upload a large image and confirm directly that the resizing is working in production. Does the resizing work even if the image isn’t square?
+```sh
+Yes, it works
+```
+
+### Chapter 14
+
+14.0 For the user with id equal to 1 from Figure 14.7, what would the value of user.following.map(&:id) be? (Recall the map(&:method_name) pattern from Section 4.3.2; user.following.map(&:id) just returns the array of ids.)
+```sh
+[2,7,10,8]
+```
+
+14.1 By referring again to Figure 14.7, determine the ids of user.following for the user with id equal to 2. What would the value of user.following.map(&:id) be for this user?
+```sh
+[1]
+```
+
+14.2 sing the create method from Table 14.1 in the console, create an active relationship for the first user in the database where the followed id is the second user.
+```sh
+>> user.active_relationships.create(followed_id: User.find(2))
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 2], ["LIMIT", 1]]
+   (0.1ms)  begin transaction
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+   (0.1ms)  rollback transaction
+=> #<Relationship id: nil, follower_id: 1, followed_id: nil, created_at: nil, updated_at: nil>
+```
+
+14.3 Confirm that the values for active_relationship.followed and active_relationship.follower are correct.
+```sh
+> active_relationship.followed
+ => nil
+
+> active_relationship.follower
+ => #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2018-06-09 15:24:13", updated_at: "2018-06-09 15:24:13", password_digest: "$2a$10$PQ3LUD1/ASvrxw73IB8mcOuLBh5uu9W9fTMpSmYtEqQ...", remember_digest: nil, admin: true, activation_digest: "$2a$10$J8DwZCT5qz1rodKLZ0BsL.hJaFzvIXjKbFfn5YuYeIo...", activated: true, activated_at: "2018-06-09 15:24:13", reset_digest: nil, reset_sent_at: nil>
 ```
