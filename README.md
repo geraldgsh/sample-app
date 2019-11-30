@@ -2487,12 +2487,12 @@ Yes, it works
 
 14.2 sing the create method from Table 14.1 in the console, create an active relationship for the first user in the database where the followed id is the second user.
 ```sh
->> user.active_relationships.create(followed_id: User.find(2))
-  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 2], ["LIMIT", 1]]
-   (0.1ms)  begin transaction
-  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
-   (0.1ms)  rollback transaction
-=> #<Relationship id: nil, follower_id: 1, followed_id: nil, created_at: nil, updated_at: nil>
+> user.active_relationships.create(followed_id: User.find(2))
+  User Load (0.1ms)  SELECT  "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 2], ["LIMIT", 1]]
+   (0.0ms)  SAVEPOINT active_record_1
+  User Load (0.1ms)  SELECT  "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+   (0.1ms)  RELEASE SAVEPOINT active_record_1
+ => #<Relationship id: nil, follower_id: 1, followed_id: nil, created_at: nil, updated_at: nil>
 ```
 
 14.3 Confirm that the values for active_relationship.followed and active_relationship.follower are correct.
@@ -2503,3 +2503,73 @@ Yes, it works
 > active_relationship.follower
  => #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2018-06-09 15:24:13", updated_at: "2018-06-09 15:24:13", password_digest: "$2a$10$PQ3LUD1/ASvrxw73IB8mcOuLBh5uu9W9fTMpSmYtEqQ...", remember_digest: nil, admin: true, activation_digest: "$2a$10$J8DwZCT5qz1rodKLZ0BsL.hJaFzvIXjKbFfn5YuYeIo...", activated: true, activated_at: "2018-06-09 15:24:13", reset_digest: nil, reset_sent_at: nil>
 ```
+
+14.4 Verify by commenting out the validations in Listing 14.5 that the tests still pass. (This is a change as of Rails 5, and in previous versions of Rails the validations are required. We’ll plan to leave them in for completeness, but it’s worth bearing in mind that you may see these validations omitted in other people’s code.)
+```sh
+class Relationship < ApplicationRecord
+  belongs_to :follower, class_name: "User"
+  belongs_to :followed, class_name: "User"
+  #validates :follower_id, presence: true
+  #validates :followed_id, presence: true
+end
+
+$ rails test
+Finished in 2.21307s
+57 tests, 306 assertions, 0 failures, 0 errors, 0 skips
+```
+
+14.5 At the console, replicate the steps shown in Listing 14.9.
+```sh
+>> user1 = User.find_by(email: "example@railstutorial.org")
+  User Load (0.3ms)  SELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "example@railstutorial.org"], ["LIMIT", 1]]
+=> #<User id: 1, name: "Micheal", email: "example@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$75dzqD2K32xQkT2xo5ywVuF62CIXwRGTuuI0ELM8r1P...", activated: true, activated_at: "2019-11-22 12:48:00", reset_digest: nil, reset_sent_at: nil>
+
+>> user2= User.find_by(email: "example-1@railstutorial.org")
+  User Load (0.5ms)  SELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "example-1@railstutorial.org"], ["LIMIT", 1]]
+=> #<User id: 2, name: "Daniela Collins", email: "example-1@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: "$2a$12$iGvhqXDZ1CbJ7XvdEXL7Ie4PYnjIziggRaTBGpXJ8IZ...", activated: true, activated_at: "2019-11-22 12:48:01", reset_digest: nil, reset_sent_at: nil>
+
+>> user1.following?(user2)
+  User Exists? (0.2ms)  SELECT 1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+=> true
+
+>> user1.unfollow(user2)
+   (0.1ms)  begin transaction
+  Relationship Destroy (304.4ms)  DELETE FROM "relationships" WHERE "relationships"."follower_id" = ? AND "relationships"."followed_id" = ?  [["follower_id", 1], ["followed_id", 2]]
+   (5.2ms)  commit transaction
+=> [#<User id: 2, name: "Daniela Collins", email: "example-1@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: "$2a$12$iGvhqXDZ1CbJ7XvdEXL7Ie4PYnjIziggRaTBGpXJ8IZ...", activated: true, activated_at: "2019-11-22 12:48:01", reset_digest: nil, reset_sent_at: nil>]
+
+>> user1.following?(user2)
+  User Exists? (0.4ms)  SELECT 1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+=> false
+```
+
+14.6 What is the SQL for each of the commands in the previous exercise?
+```sh
+1. SELECT  1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+
+2. SELECT  "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]SQL (7.1ms)  
+INSERT INTO "relationships" ("follower_id", "followed_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["follower_id", 1], ["followed_id", 2], ["created_at", "2018-06-14 14:28:04.929149"], ["updated_at", "2018-06-14 14:28:04.929149"]]
+
+3. SELECT  1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+
+4. DELETE FROM "relationships" WHERE "relationships"."follower_id" = ? AND "relationships"."followed_id" = 2  [["follower_id", 1]]
+
+5. SELECT  1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+```s
+
+14.7 At the console, create several followers for the first user in the database (which you should call user). What is the value of user.followers.map(&:id)?
+```sh> user.followers.map(&:id)
+  User Load (0.2ms)  SELECT "users".* FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+ => [2, 3, 4, 5, 6, 7]
+```
+
+14.8 Confirm that user.followers.count matches the number of followers you created in the previous exercise.
+```sh
+user.followers.count
+   (0.2ms)  SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+ => 6
+
+It matches the number of users.
+```
+
+14.9 What is the SQL used by user.followers.count? How is this different from user.followers.to_a.count? Hint: Suppose that the user had a million followers.
