@@ -2573,3 +2573,25 @@ It matches the number of users.
 ```
 
 14.9 What is the SQL used by user.followers.count? How is this different from user.followers.to_a.count? Hint: Suppose that the user had a million followers.
+```sh
+SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+
+user.followers.count runs the count directly in the database, and user.followers.to_a.count runs the count in the array, so if we had a million followers, user.followers.to_a.count would be better, because it wouldn't affect the database performance.
+```
+
+14.10 Using the console, confirm that User.first.followers.count matches the value expected from Listing 14.14.
+```sh
+>> User.first.followers.count
+   (0.5ms)  SELECT sqlite_version(*)
+  User Load (0.3ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+   (0.3ms)  SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+=> 38
+```
+
+14.11 Confirm that User.first.following.count is correct as well.
+```sh
+>> User.first.following.count
+  User Load (0.3ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+   (0.4ms)  SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ?  [["follower_id", 1]]
+=> 49
+```
