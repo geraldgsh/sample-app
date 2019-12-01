@@ -2723,3 +2723,12 @@ Micropost.all
       assert_not michael.feed.include?(post_unfollowed)
     end
 ```
+
+14.26 Write an integration test to verify that the first page of the feed appears on the Home page as required. A template appears in Listing 14.49.
+```sh
+assert_match CGI.escapeHTML(micropost.content), response.body
+```
+
+14.27 Note that Listing 14.49 escapes the expected HTML using CGI.escapeHTML (which is closely related to the CGI.escape method we used in Section 11.2.3 to escape URLs). Why is escaping the HTML necessary in this case? Hint: Try removing the escaping and carefully inspect the page source for the micropost content that doesn’t match. Using the search feature of your terminal shell (Cmd-F on Ctrl-F on most systems) to find the word “sorry” may prove particularly helpful.
+```sh
+```
