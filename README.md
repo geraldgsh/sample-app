@@ -2692,3 +2692,34 @@ test_should_unfollow_a_user_the_standard_way:
 ```sh 
 The tests are still green, because it goes for either html or js. The procedure in the previous exercise would catch it because we define what we need.
 ``
+
+14.23 In Listing 14.44, remove the part of the query that finds the user’s own posts. Which test in Listing 14.42 breaks?
+```sh
+Micropost.where("user_id IN (?)", id)
+
+# Posts from self
+    michael.microposts.each do |post_self|
+      assert michael.feed.include?(post_self)
+    end
+```
+
+14.24 In Listing 14.44, remove the part of the query that finds the followed users’ posts. Which test in Listing 14.42 breaks?
+```sh
+Micropost.where("user_id = ?", following_ids)
+
+# Posts from followed user
+    lana.microposts.each do |post_following|
+      assert michael.feed.include?(post_following)
+    end
+```
+
+
+14.25 How could you change the query in Listing 14.44 to have the feed erroneously return microposts of unfollowed users, thereby breaking the third test in Listing 14.42? Hint: Returning all the microposts would do the trick.
+```sh
+Micropost.all
+
+# Posts from unfollowed user
+    archer.microposts.each do |post_unfollowed|
+      assert_not michael.feed.include?(post_unfollowed)
+    end
+```
