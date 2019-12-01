@@ -2124,3 +2124,611 @@ $ rails test
 Finished in 2.23639s
 42 tests, 210 assertions, 0 failures, 0 errors, 0 skips
 ```
+
+### Chapter 13
+
+13.1 Using Micropost.new in the console, instantiate a new Micropost object called micropost with content “Lorem ipsum” and user id equal to the id of the first user in the database. What are the values of the magic columns created_at and updated_at?
+```sh
+nil
+
+>> micropost = Micropost.new(content: "Lorem ipsum", user_id: 1)
+   (1.0ms)  SELECT sqlite_version(*)
+=> #<Micropost id: nil, content: "Lorem ipsum", user_id: 1, created_at: nil, updated_at: nil>
+```
+
+13.2 What is micropost.user for the micropost in the previous exercise? What about micropost.user.name?
+```sh
+>> micropost.user
+  User Load (0.4ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+>> micropost.user.name
+=> "Example User"
+```
+
+13.3 Save the micropost to the database. What are the values of the magic columns now?
+```sh
+>> micropost.save
+   (0.1ms)  begin transaction
+  Micropost Create (296.8ms)  INSERT INTO "microposts" ("content", "user_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["content", "Lorem ipsum"], ["user_id", 1], ["created_at", "2019-11-21 17:24:57.982476"], ["updated_at", "2019-11-21 17:24:57.982476"]]
+   (3.1ms)  commit transaction
+=> true
+```
+
+13.4 At the console, instantiate a micropost with no user id and blank content. Is it valid? What are the full error messages?
+```sh
+>> micropost = Micropost.new
+=> #<Micropost id: nil, content: nil, user_id: nil, created_at: nil, updated_at: nil>
+>> micropost.save
+=> false
+>> micropost.errors.full_messages
+=> ["User must exist"]
+```
+
+13.5 At the console, instantiate a second micropost with no user id and content that’s too long. Is it valid? What are the full error messages?
+```sh
+>> m = Micropost.new(content: "h" * 200)
+   (1.4ms)  SELECT sqlite_version(*)
+=> #<Micropost id: nil, content: "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh...", user_id: nil, created_at: nil, updated_at: nil>
+>> m.save
+=> false
+>> m.errors.full_messages
+=> ["User must exist", "User can't be blank", "Content is too long (maximum is 140 characters)"]
+```
+
+13.6 Set user to the first user in the database. What happens when you execute the command micropost = user.microposts.create(content: "Lorem ipsum")?
+```sh
+>> user = User.first
+   (0.8ms)  SELECT sqlite_version(*)
+  User Load (0.3ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+>>
+>> micropost = user.microposts.create(content: "Lorem ipsum")
+   (0.1ms)  begin transaction
+  Micropost Create (1.8ms)  INSERT INTO "microposts" ("content", "user_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["content", "Lorem ipsum"], ["user_id", 1], ["created_at", "2019-11-21 19:13:03.393517"], ["updated_at", "2019-11-21 19:13:03.393517"]]
+   (3.6ms)  commit transaction
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+```
+
+13.7 The previous exercise should have created a micropost in the database. Confirm this by running user.microposts.find(micropost.id). What if you write micropost instead of micropost.id?
+```sh
+>> user.microposts.find(micropost.id)
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? AND "microposts"."id" = ? LIMIT ?  [["user_id", 1], ["id", 2], ["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+```
+
+13.8 What is the value of user == micropost.user? How about user.microposts.first == micropost?
+```sh
+>> user == micropost.user
+=> true
+>> user.microposts.first == micropost
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."id" ASC LIMIT ?  [["user_id", 1], ["LIMIT", 1]]
+=> false
+```
+
+13.9 How does the value of Micropost.first.created_at compare to Micropost.last.created_at?
+```sh
+>> Micropost.last.created_at
+   (0.9ms)  SELECT sqlite_version(*)
+  Micropost Load (0.6ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" ASC LIMIT ?  [["LIMIT", 1]]
+=> Thu, 21 Nov 2019 17:24:57 UTC +00:00
+>>
+
+>> Micropost.first.created_at
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" DESC LIMIT ?  [["LIMIT", 1]]
+=> Thu, 21 Nov 2019 19:13:03 UTC +00:00
+>>
+```
+
+13.10 What are the SQL queries for Micropost.first and Micropost.last? Hint: They are printed out by the console.
+```
+>> Micropost.firstt
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" DESC LIMIT ?  [["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+
+>> Micropost.last
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<Micropost id: 1, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 17:24:57", updated_at: "2019-11-21 17:24:57">
+```
+
+13.11 Let user be the first user in the database. What is the id of its first micropost? Destroy the first user in the database using the destroy method, then confirm using Micropost.find that the user’s first micropost was also destroyed.
+```sh
+>> user = User.first
+  User Load (0.5ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+
+>> micropost = Micropost.first
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" ORDER BY "microposts"."created_at" DESC LIMIT ?  [["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+
+>> user.microposts.first
+  Micropost Load (0.3ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."created_at" DESC LIMIT ?  [["user_id", 1], ["LIMIT", 1]]
+=> #<Micropost id: 2, content: "Lorem ipsum", user_id: 1, created_at: "2019-11-21 19:13:03", updated_at: "2019-11-21 19:13:03">
+
+>> user.destroy
+   (0.1ms)  begin transaction
+  Micropost Load (0.4ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."created_at" DESC  [["user_id", 1]]
+  Micropost Destroy (290.6ms)  DELETE FROM "microposts" WHERE "microposts"."id" = ?  [["id", 2]]
+  Micropost Destroy (0.2ms)  DELETE FROM "microposts" WHERE "microposts"."id" = ?  [["id", 1]]
+  User Destroy (0.4ms)  DELETE FROM "users" WHERE "users"."id" = ?  [["id", 1]]
+   (3.3ms)  commit transaction
+=> #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2019-11-14 22:41:12", updated_at: "2019-11-16 20:53:00", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$Ik89DtZC0Dx6NL.wWKxmtOB6v/paNkHaMptSXr.SEbf...", activated: true, activated_at: "2019-11-14 22:41:12", reset_digest: "$2a$12$LL3rqLCgDiJJECF3FJOMqum35U7SwVxF27NI9Cc7V70...", reset_sent_at: "2019-11-16 20:53:00">
+>>
+
+>> user.microposts.find(1)
+  Micropost Load (0.2ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? AND "microposts"."id" = ? ORDER BY "microposts"."created_at" DESC LIMIT ?  [["user_id", 1], ["id", 1], ["LIMIT", 1]]
+Traceback (most recent call last):
+        1: from (irb):91
+ActiveRecord::RecordNotFound (Couldn't find Micropost with 'id'=1 [WHERE "microposts"."user_id" = ?])
+```
+
+13.12 As mentioned briefly in Section 7.3.3, helper methods like time_ago_in_words are available in the Rails console via the helper object. Using helper, apply time_ago_in_words to 3.weeks.ago and 6.months.ago.
+```sh
+>> helper.time_ago_in_words(3.weeks.ago)
+=> "21 days"
+>> helper.time_ago_in_words(6.months.ago)
+=> "6 months"
+```
+
+13.13 What is the result of helper.time_ago_in_words(1.year.ago)?
+```sh
+>> helper.time_ago_in_words(1.year.ago)
+=> "about 1 year"
+```
+
+13.14 What is the Ruby class for a page of microposts? Hint: Use the code in Listing 13.23 as your model, and call the class method on paginate with the argument page: nil.
+```sh
+> user.microposts.paginate(page: nil).class
+ => Micropost::ActiveRecord_AssociationRelation
+```
+
+13.15 See if you can guess the result of running (1..10).to_a.take(6). Check at the console to see if your guess is right.
+````sh
+>> (1..10).to_a.take(6)
+=> [1, 2, 3, 4, 5, 6]
+```
+
+13.16 Is the to_a method in the previous exercise necessary?
+```sh
+No, it isn't necessary, the result is the same as in the other exercise
+
+> (1..10).take(6)
+ => [1, 2, 3, 4, 5, 6]
+```
+
+13.17 Faker has a huge number of occasionally amusing applications. By consulting the Faker documentation, learn how to print out a fake university name, a fake phone number, a fake Hipster Ipsum sentence, and a fake Chuck Norris fact.
+```sh
+Fake University name
+>> Faker::University.name
+=> "Farrell Institute"
+
+Fake phone number
+>> Faker::PhoneNumber.phone_number
+=> "1-622-402-5560"
+
+Fake hipster ipsum
+>> Faker::Hipster.sentence
+=> "Loko pinterest stumptown bicycle rights shoreditch pour-over wolf food truck next level."
+
+Fake Chuck Norris Fact
+>> Faker::ChuckNorris.fact
+=> "The class object inherits from Chuck Norris."
+```
+
+13.18 Comment out the application code needed to change the two 'h1' lines in Listing 13.28 from green to red.
+```sh
+Turns red after removing the code below
+
+<section class="user_info">
+      <h1>
+        <%#= gravatar_for @user %>
+        <%#= @user.name %>
+      </h1>
+</section>
+```
+
+13.19 Update Listing 13.28 to test that will_paginate appears only once. Hint: Refer to Table 5.2.
+```sh
+assert_select 'div.pagination', count: 1
+```
+
+13.20 Why is it a bad idea to leave a copy of logged_in_user in the Users controller?
+```sh
+Because of the DRY principle in Rails, the repetition of code is a bad practice.
+```
+
+13.21 Refactor the Home page to use separate partials for the two branches of the if-else statement.
+```sh
+<% if logged_in? %>
+  <%= render 'microposts' %>
+<% else %>
+  <%= render 'welcome' %>
+<% end %>
+```
+
+13.22 Use the newly created micropost UI to create the first real micropost. What are the contents of the INSERT command in the server log?
+```sh
+Started POST "/microposts" for ::1 at 2019-11-22 21:33:19 +0800
+Processing by MicropostsController#create as HTML
+  Parameters: {"authenticity_token"=>"s+3Orn7Um1IhE3VLspmozl88TDKH+mGnZ+99xHig4W934ezp29/S5FosjvupLH6IvlMYs1Vlt1KeWCp6/R9qwg==", "micropost"=>{"content"=>"bother\r\n"}, "commit"=>"Post"}
+  User Load (0.3ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+  ↳ app/helpers/sessions_helper.rb:22:in `current_user'
+   (0.3ms)  begin transaction
+  ↳ app/controllers/microposts_controller.rb:6:in `create'
+  Micropost Create (1.9ms)  INSERT INTO "microposts" ("content", "user_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["content", "bother\r\n"], ["user_id", 1], ["created_at", "2019-11-22 13:33:19.851703"], ["updated_at", "2019-11-22 13:33:19.851703"]]
+  ↳ app/controllers/microposts_controller.rb:6:in `create'
+   (5.2ms)  commit transaction
+  ↳ app/controllers/microposts_controller.rb:6:in `create'
+Redirected to http://localhost:3000/
+Completed 302 Found in 24ms (ActiveRecord: 7.6ms | Allocations: 6441)
+```
+
+13.23 In the console, set user to the first user in the database. Confirm that the values of Micropost.where("user_id = ?", user.id), user.microposts, and user.feed are all the same. Hint: It’s probably easiest to compare directly using ==.
+```sh
+>> user = User.first
+   (0.8ms)  SELECT sqlite_version(*)
+  User Load (0.4ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+=> #<User id: 1, name: "Micheal", email: "example@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$75dzqD2K32xQkT2xo5ywVuF62CIXwRGTuuI0ELM8r1P...", activated: true, activated_at: "2019-11-22 12:48:00", reset_digest: nil, reset_sent_at: nil>
+>>
+>>
+>> Micropost.where("user_id = ?", user.id) == user.microposts
+  Micropost Load (0.5ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? ORDER BY "microposts"."created_at" DESC  [["user_id", 1]]
+  Micropost Load (0.2ms)  SELECT "microposts".* FROM "microposts" WHERE (user_id = 1) ORDER BY "microposts"."created_at" DESC
+=> true
+```
+
+13.24 Create a new micropost and then delete it. What are the contents of the DELETE command in the server log?
+```sh
+Started DELETE "/microposts/139" for ::1 at 2019-11-22 21:42:07 +0800
+Processing by MicropostsController#destroy as HTML
+  Parameters: {"authenticity_token"=>"aamNWFNi6G0kpesCkTExIsdpyLza+/wjNZhMx2rbcVmtpa8f9mmh21+aELKKhOdkJgacPQhkKtbMLxt572T69A==", "id"=>"139"}
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+  ↳ app/helpers/sessions_helper.rb:22:in `current_user'
+  Micropost Load (0.2ms)  SELECT "microposts".* FROM "microposts" WHERE "microposts"."user_id" = ? AND "microposts"."id" = ? ORDER BY "microposts"."created_at" DESC LIMIT ?  [["user_id", 1], ["id", 139], ["LIMIT", 1]]
+  ↳ app/controllers/microposts_controller.rb:29:in `correct_user'
+   (0.0ms)  begin transaction
+  ↳ app/controllers/microposts_controller.rb:17:in `destroy'
+  Micropost Destroy (1.3ms)  DELETE FROM "microposts" WHERE "microposts"."id" = ?  [["id", 139]]
+  ↳ app/controllers/microposts_controller.rb:17:in `destroy'
+   (3.1ms)  commit transaction
+  ↳ app/controllers/microposts_controller.rb:17:in `destroy'
+Redirected to http://localhost:3000/
+Completed 302 Found in 16ms (ActiveRecord: 4.9ms | Allocations: 5363)
+```
+
+13.25 Confirm directly in the browser that the line redirect_to request.referrer || root_url can be replaced with the line redirect_back(fallback_location: root_url). (This method was added in Rails 5.)
+```sh
+Yes, the succes message is flashed.
+```
+
+13.26 For each of the four scenarios indicated by comments in Listing 13.55 (starting with “Invalid submission”), comment out application code to get the corresponding test to red, then uncomment to get back to green.
+```sh
+Done
+```
+
+13.27 Add tests for the sidebar micropost count (including proper pluralization). Listing 13.57 will help get you started.
+```sh
+test "micropost sidebar count" do
+    log_in_as(@user)
+    get root_path
+    assert_match "#{@user.microposts.count} microposts", response.body
+    # User with zero microposts
+    other_user = users(:malory)
+    log_in_as(other_user)
+    get root_path
+    assert_match "0 microposts", response.body
+    other_user.microposts.create!(content: "A micropost")
+    get root_path
+    assert_match "1 micropost", response.body
+end
+
+$rails test
+
+# Running:
+
+....................
+
+Finished in 2.238520s, 24.1231 runs/s, 135.3573 assertions/s.
+54 runs, 303 assertions, 0 failures, 0 errors, 0 skips
+```
+
+13.28 Upload a micropost with attached image. Does the result look too big? (If so, don’t worry; we’ll fix it in Section 13.4.3.)
+```sh
+Yes, its too big
+```
+
+13.29 Following the template in Listing 13.63, write a test of the image uploader in Section 13.4. As preparation, you should add an image to the fixtures directory (using, e.g, cp app/assets/images/rails.png test/fixtures/). The additional assertions in Listing 13.63 check both for a file upload field on the Home page and for a valid image attribute on the micropost resulting from valid submission. Note the use of the special fixture_file_upload method for uploading files as fixtures inside tests.18 Hint: To check for a valid picture attribute, use the assigns method mentioned in Section 11.3.3 to access the micropost in the create action after valid submission.
+```sh
+$rails test
+
+# Running:
+
+....................
+
+Finished in 1.779459s, 30.3463 runs/s, 170.8385 assertions/s.
+54 runs, 304 assertions, 0 failures, 0 errors, 0 skips
+```
+
+13.30 What happens if you try uploading an image bigger than 5 megabytes?
+```sh
+'Maximum file size is 4MB. Please choose a smaller file.'
+```
+
+13.31 What happens if you try uploading a file with an invalid extension?
+```sh
+Picture You are not allowed to upload "pdf" files, allowed types: jpg, jpeg, gif, png
+```
+
+13.32 Upload a large image and confirm directly that the resizing is working. Does the resizing work even if the image isn’t square?
+```sh
+Yes, resizing works
+```
+
+13.33 If you completed the image upload test in Listing 13.63, at this point your test suite may be giving you a confusing error message. Fix this issue by configuring CarrierWave to skip image resizing in tests using the initializer file shown in Listing 13.68.
+```sh
+Done
+```
+
+13.34 Upload a large image and confirm directly that the resizing is working in production. Does the resizing work even if the image isn’t square?
+```sh
+Yes, it works
+```
+
+### Chapter 14
+
+14.0 For the user with id equal to 1 from Figure 14.7, what would the value of user.following.map(&:id) be? (Recall the map(&:method_name) pattern from Section 4.3.2; user.following.map(&:id) just returns the array of ids.)
+```sh
+[2,7,10,8]
+```
+
+14.1 By referring again to Figure 14.7, determine the ids of user.following for the user with id equal to 2. What would the value of user.following.map(&:id) be for this user?
+```sh
+[1]
+```
+
+14.2 sing the create method from Table 14.1 in the console, create an active relationship for the first user in the database where the followed id is the second user.
+```sh
+> user.active_relationships.create(followed_id: User.find(2))
+  User Load (0.1ms)  SELECT  "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 2], ["LIMIT", 1]]
+   (0.0ms)  SAVEPOINT active_record_1
+  User Load (0.1ms)  SELECT  "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+   (0.1ms)  RELEASE SAVEPOINT active_record_1
+ => #<Relationship id: nil, follower_id: 1, followed_id: nil, created_at: nil, updated_at: nil>
+```
+
+14.3 Confirm that the values for active_relationship.followed and active_relationship.follower are correct.
+```sh
+> active_relationship.followed
+ => nil
+
+> active_relationship.follower
+ => #<User id: 1, name: "Example User", email: "example@railstutorial.org", created_at: "2018-06-09 15:24:13", updated_at: "2018-06-09 15:24:13", password_digest: "$2a$10$PQ3LUD1/ASvrxw73IB8mcOuLBh5uu9W9fTMpSmYtEqQ...", remember_digest: nil, admin: true, activation_digest: "$2a$10$J8DwZCT5qz1rodKLZ0BsL.hJaFzvIXjKbFfn5YuYeIo...", activated: true, activated_at: "2018-06-09 15:24:13", reset_digest: nil, reset_sent_at: nil>
+```
+
+14.4 Verify by commenting out the validations in Listing 14.5 that the tests still pass. (This is a change as of Rails 5, and in previous versions of Rails the validations are required. We’ll plan to leave them in for completeness, but it’s worth bearing in mind that you may see these validations omitted in other people’s code.)
+```sh
+class Relationship < ApplicationRecord
+  belongs_to :follower, class_name: "User"
+  belongs_to :followed, class_name: "User"
+  #validates :follower_id, presence: true
+  #validates :followed_id, presence: true
+end
+
+$ rails test
+Finished in 2.21307s
+57 tests, 306 assertions, 0 failures, 0 errors, 0 skips
+```
+
+14.5 At the console, replicate the steps shown in Listing 14.9.
+```sh
+>> user1 = User.find_by(email: "example@railstutorial.org")
+  User Load (0.3ms)  SELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "example@railstutorial.org"], ["LIMIT", 1]]
+=> #<User id: 1, name: "Micheal", email: "example@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: true, activation_digest: "$2a$12$75dzqD2K32xQkT2xo5ywVuF62CIXwRGTuuI0ELM8r1P...", activated: true, activated_at: "2019-11-22 12:48:00", reset_digest: nil, reset_sent_at: nil>
+
+>> user2= User.find_by(email: "example-1@railstutorial.org")
+  User Load (0.5ms)  SELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?  [["email", "example-1@railstutorial.org"], ["LIMIT", 1]]
+=> #<User id: 2, name: "Daniela Collins", email: "example-1@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: "$2a$12$iGvhqXDZ1CbJ7XvdEXL7Ie4PYnjIziggRaTBGpXJ8IZ...", activated: true, activated_at: "2019-11-22 12:48:01", reset_digest: nil, reset_sent_at: nil>
+
+>> user1.following?(user2)
+  User Exists? (0.2ms)  SELECT 1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+=> true
+
+>> user1.unfollow(user2)
+   (0.1ms)  begin transaction
+  Relationship Destroy (304.4ms)  DELETE FROM "relationships" WHERE "relationships"."follower_id" = ? AND "relationships"."followed_id" = ?  [["follower_id", 1], ["followed_id", 2]]
+   (5.2ms)  commit transaction
+=> [#<User id: 2, name: "Daniela Collins", email: "example-1@railstutorial.org", created_at: "2019-11-22 12:48:01", updated_at: "2019-11-22 12:48:01", password_digest: [FILTERED], remember_digest: nil, admin: false, activation_digest: "$2a$12$iGvhqXDZ1CbJ7XvdEXL7Ie4PYnjIziggRaTBGpXJ8IZ...", activated: true, activated_at: "2019-11-22 12:48:01", reset_digest: nil, reset_sent_at: nil>]
+
+>> user1.following?(user2)
+  User Exists? (0.4ms)  SELECT 1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+=> false
+```
+
+14.6 What is the SQL for each of the commands in the previous exercise?
+```sh
+1. SELECT  1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+
+2. SELECT  "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]SQL (7.1ms)  
+INSERT INTO "relationships" ("follower_id", "followed_id", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["follower_id", 1], ["followed_id", 2], ["created_at", "2018-06-14 14:28:04.929149"], ["updated_at", "2018-06-14 14:28:04.929149"]]
+
+3. SELECT  1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+
+4. DELETE FROM "relationships" WHERE "relationships"."follower_id" = ? AND "relationships"."followed_id" = 2  [["follower_id", 1]]
+
+5. SELECT  1 AS one FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ? AND "users"."id" = ? LIMIT ?  [["follower_id", 1], ["id", 2], ["LIMIT", 1]]
+```s
+
+14.7 At the console, create several followers for the first user in the database (which you should call user). What is the value of user.followers.map(&:id)?
+```sh> user.followers.map(&:id)
+  User Load (0.2ms)  SELECT "users".* FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+ => [2, 3, 4, 5, 6, 7]
+```
+
+14.8 Confirm that user.followers.count matches the number of followers you created in the previous exercise.
+```sh
+user.followers.count
+   (0.2ms)  SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+ => 6
+
+It matches the number of users.
+```
+
+14.9 What is the SQL used by user.followers.count? How is this different from user.followers.to_a.count? Hint: Suppose that the user had a million followers.
+```sh
+SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+
+user.followers.count runs the count directly in the database, and user.followers.to_a.count runs the count in the array, so if we had a million followers, user.followers.to_a.count would be better, because it wouldn't affect the database performance.
+```
+
+14.10 Using the console, confirm that User.first.followers.count matches the value expected from Listing 14.14.
+```sh
+>> User.first.followers.count
+   (0.5ms)  SELECT sqlite_version(*)
+  User Load (0.3ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+   (0.3ms)  SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."follower_id" WHERE "relationships"."followed_id" = ?  [["followed_id", 1]]
+=> 38
+```
+
+14.11 Confirm that User.first.following.count is correct as well.
+```sh
+>> User.first.following.count
+  User Load (0.3ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT ?  [["LIMIT", 1]]
+   (0.4ms)  SELECT COUNT(*) FROM "users" INNER JOIN "relationships" ON "users"."id" = "relationships"."followed_id" WHERE "relationships"."follower_id" = ?  [["follower_id", 1]]
+=> 49
+```
+
+14.12 Verify that /users/2 has a follow form and that /users/5 has an unfollow form. Is there a follow form on /users/1?
+```sh
+/users/2 with follow form
+
+/users/5 with unfollow form
+
+/users/1 without any form
+
+The /users/1 page doesn't have any form because it's the current user, he can't follow or unfollow himself
+```
+
+14.13 Confirm in the browser that the stats appear correctly on the Home page and on the profile page.
+```sh
+
+```
+
+14.14 Write tests for the stats on the Home page. Hint: Add to the test in Listing 13.28. Why don’t we also have to test the stats on the profile page?
+```sh
+# test/integration/user_profile_test.rb
+
+require 'test_helper'
+
+class UsersProfileTest < ActionDispatch::IntegrationTest
+  include ApplicationHelper
+
+  def setup
+    @user = users(:michael)
+  end
+
+  test "profile display" do
+    get user_path(@user)
+    assert_template 'users/show'
+    assert_select 'title', full_title(@user.name)
+    assert_select 'h1', text: @user.name
+    assert_select 'h1>img.gravatar'
+    assert_match @user.microposts.count.to_s, response.body
+    assert_select 'div.pagination', count: 1
+    @user.microposts.paginate(page: 1).each do |micropost|
+      assert_match micropost.content, response.body
+    end
+    assert_match @user.followers.count.to_s, response.body
+    assert_match @user.following.count.to_s, response.body
+  end
+end
+```
+
+14.15 Verify in a browser that /users/1/followers and /users/1/following work. Do the image links in the sidebar work as well?
+```sh
+It works!
+```
+
+14.16 Comment out the application code needed to turn the assert_select tests in Listing 14.29 red to confirm they’re testing the right thing.
+```sh
+
+```
+
+14.17 Follow and unfollow /users/2 through the web. Did it work?
+```sh
+It works!
+```
+
+14.18 According to the server log, which templates are rendered in each case?
+```sh
+  Rendered users/show.html.erb within layouts/application (Duration: 30.1ms | Allocations: 15391)
+  Rendered layouts/_rails_default.html.erb (Duration: 23.5ms | Allocations: 26597)
+  Rendered layouts/_shim.html.erb (Duration: 0.0ms | Allocations: 5)
+  Rendered layouts/_header.html.erb (Duration: 0.4ms | Allocations: 354)
+  Rendered layouts/_footer.html.erb (Duration: 0.1ms | Allocations: 93)
+Completed 200 OK in 60ms (Views: 55.2ms | ActiveRecord: 2.3ms | Allocations: 44246)
+```
+
+14.19 Unfollow and refollow /users/2 through the web. Did it work?
+```sh
+It works!
+```
+
+14.20 According to the server log, which templates are rendered in each case?
+```sh
+Rendering relationships/create.js.erb
+Rendered users/_unfollow.html.erb (Duration: 3.0ms | Allocations: 2177)
+Rendered relationships/create.js.erb (Duration: 6.9ms | Allocations: 4078)
+```
+
+14.21 By commenting and uncommenting each of the lines in the respond_to blocks (Listing 14.36), verify that the tests are testing the right things. Which test fails in each case?
+```sh
+test_should_follow_a_user_the_standard_way:
+
+test_should_unfollow_a_user_the_standard_way:
+```
+
+
+14.22 What happens if you delete one of the occurrences of xhr: true in Listing 14.40? Explain why this is a problem, and why the procedure in the previous exercise would catch it.
+
+```sh 
+The tests are still green, because it goes for either html or js. The procedure in the previous exercise would catch it because we define what we need.
+``
+
+14.23 In Listing 14.44, remove the part of the query that finds the user’s own posts. Which test in Listing 14.42 breaks?
+```sh
+Micropost.where("user_id IN (?)", id)
+
+# Posts from self
+    michael.microposts.each do |post_self|
+      assert michael.feed.include?(post_self)
+    end
+```
+
+14.24 In Listing 14.44, remove the part of the query that finds the followed users’ posts. Which test in Listing 14.42 breaks?
+```sh
+Micropost.where("user_id = ?", following_ids)
+
+# Posts from followed user
+    lana.microposts.each do |post_following|
+      assert michael.feed.include?(post_following)
+    end
+```
+
+
+14.25 How could you change the query in Listing 14.44 to have the feed erroneously return microposts of unfollowed users, thereby breaking the third test in Listing 14.42? Hint: Returning all the microposts would do the trick.
+```sh
+Micropost.all
+
+# Posts from unfollowed user
+    archer.microposts.each do |post_unfollowed|
+      assert_not michael.feed.include?(post_unfollowed)
+    end
+```
+
+14.26 Write an integration test to verify that the first page of the feed appears on the Home page as required. A template appears in Listing 14.49.
+```sh
+assert_match CGI.escapeHTML(micropost.content), response.body
+```
+
+14.27 Note that Listing 14.49 escapes the expected HTML using CGI.escapeHTML (which is closely related to the CGI.escape method we used in Section 11.2.3 to escape URLs). Why is escaping the HTML necessary in this case? Hint: Try removing the escaping and carefully inspect the page source for the micropost content that doesn’t match. Using the search feature of your terminal shell (Cmd-F on Ctrl-F on most systems) to find the word “sorry” may prove particularly helpful.
+```sh
+```

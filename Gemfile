@@ -3,6 +3,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.6.5'
 
+gem 'fog', '~> 2.2'
+gem 'mini_magick', '~> 4.9', '>= 4.9.5'
+gem 'carrierwave', '~> 2.0', '>= 2.0.2'
 gem 'will_paginate', '~> 3.1.0'
 gem 'bootstrap-will_paginate', '1.0.0'
 gem 'faker',          '1.7.3'
@@ -59,7 +62,7 @@ group :test do
 end
 
 group :production do
-  gem 'pg'
+  gem 'pg', '~> 1.1', '>= 1.1.3'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
