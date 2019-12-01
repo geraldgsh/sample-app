@@ -2667,3 +2667,28 @@ It works!
 Completed 200 OK in 60ms (Views: 55.2ms | ActiveRecord: 2.3ms | Allocations: 44246)
 ```
 
+14.19 Unfollow and refollow /users/2 through the web. Did it work?
+```sh
+It works!
+```
+
+14.20 According to the server log, which templates are rendered in each case?
+```sh
+Rendering relationships/create.js.erb
+Rendered users/_unfollow.html.erb (Duration: 3.0ms | Allocations: 2177)
+Rendered relationships/create.js.erb (Duration: 6.9ms | Allocations: 4078)
+```
+
+14.21 By commenting and uncommenting each of the lines in the respond_to blocks (Listing 14.36), verify that the tests are testing the right things. Which test fails in each case?
+```sh
+test_should_follow_a_user_the_standard_way:
+
+test_should_unfollow_a_user_the_standard_way:
+```
+
+
+14.22 What happens if you delete one of the occurrences of xhr: true in Listing 14.40? Explain why this is a problem, and why the procedure in the previous exercise would catch it.
+
+```sh 
+The tests are still green, because it goes for either html or js. The procedure in the previous exercise would catch it because we define what we need.
+``
