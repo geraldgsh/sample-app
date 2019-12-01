@@ -2641,3 +2641,14 @@ class UsersProfileTest < ActionDispatch::IntegrationTest
   end
 end
 ```
+
+14.15 Verify in a browser that /users/1/followers and /users/1/following work. Do the image links in the sidebar work as well?
+```sh
+It works!
+```
+
+14.16 Comment out the application code needed to turn the assert_select tests in Listing 14.29 red to confirm they’re testing the right thing.
+```sh
+
+```
+
