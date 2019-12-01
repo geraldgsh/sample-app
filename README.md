@@ -2652,3 +2652,18 @@ It works!
 
 ```
 
+14.17 Follow and unfollow /users/2 through the web. Did it work?
+```sh
+It works!
+```
+
+14.18 According to the server log, which templates are rendered in each case?
+```sh
+  Rendered users/show.html.erb within layouts/application (Duration: 30.1ms | Allocations: 15391)
+  Rendered layouts/_rails_default.html.erb (Duration: 23.5ms | Allocations: 26597)
+  Rendered layouts/_shim.html.erb (Duration: 0.0ms | Allocations: 5)
+  Rendered layouts/_header.html.erb (Duration: 0.4ms | Allocations: 354)
+  Rendered layouts/_footer.html.erb (Duration: 0.1ms | Allocations: 93)
+Completed 200 OK in 60ms (Views: 55.2ms | ActiveRecord: 2.3ms | Allocations: 44246)
+```
+
